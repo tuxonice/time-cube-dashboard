@@ -37,7 +37,7 @@ class Database
     public static function init(): void
     {
         $db = self::getInstance();
-        
+
         // Run migrations automatically if needed
         try {
             $config = new PhpFile(dirname(__DIR__, 2) . '/migrations-config.php');
@@ -45,13 +45,13 @@ class Database
                 $config,
                 new ExistingConnection($db->connection)
             );
-            
+
             $statusCalculator = $dependencyFactory->getMigrationStatusCalculator();
             $migrator = $dependencyFactory->getMigrator();
-            
+
             // Check if there are new migrations to execute
             $newMigrations = $statusCalculator->getNewMigrations();
-            
+
             if (count($newMigrations) > 0) {
                 // Execute all new migrations
                 $planCalculator = $dependencyFactory->getMigrationPlanCalculator();

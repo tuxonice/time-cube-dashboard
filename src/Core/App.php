@@ -15,7 +15,7 @@ class App
     public function __construct()
     {
         $this->request = Request::createFromGlobals();
-        
+
         $this->session = new Session(new NativeSessionStorage());
         $this->session->start();
         $this->request->setSession($this->session);
@@ -37,7 +37,7 @@ class App
     public function run(): void
     {
         $response = $this->router->dispatch();
-        
+
         if ($response) {
             $response->send();
         }

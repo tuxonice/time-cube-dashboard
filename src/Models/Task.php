@@ -26,7 +26,10 @@ class Task
         return Database::getInstance()->fetchAll(
             'SELECT t.*,
                     COALESCE(SUM(te.duration), 0) as total_seconds,
-                    (SELECT COUNT(*) FROM time_entries WHERE task_id = t.id AND stopped_at IS NULL AND started_at IS NOT NULL) as has_running
+                    (SELECT COUNT(*) FROM time_entries 
+                     WHERE task_id = t.id 
+                     AND stopped_at IS NULL 
+                     AND started_at IS NOT NULL) as has_running
              FROM tasks t
              LEFT JOIN time_entries te ON te.task_id = t.id
              WHERE t.project_id = ?

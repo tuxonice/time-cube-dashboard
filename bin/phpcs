@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# PHP_CodeSniffer wrapper script
+
+# Run phpcs with all arguments passed through
+php vendor/bin/phpcs "$@"

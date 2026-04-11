@@ -86,10 +86,13 @@ Register a new user account through the web interface
 ### Development Commands
 
 ```bash
-make up       # Build and start Docker containers (first run or after Dockerfile changes)
-make start    # Start existing containers
-make stop     # Stop containers
-make cli      # Open bash shell inside the app container
+make up        # Build and start Docker containers (first run or after Dockerfile changes)
+make start     # Start existing containers
+make stop      # Stop containers
+make cli       # Open bash shell inside the app container
+make phpcs     # Check code style with PHP_CodeSniffer
+make phpcbf    # Fix code style issues automatically
+make test-code # Run all code quality checks
 ```
 
 ### Installing Dependencies
@@ -126,10 +129,35 @@ docker compose exec app php bin/migrations list
 
 The database schema is version-controlled through migrations, eliminating the need for manual SQL execution.
 
+### Code Quality (PHPCS)
+
+The project uses PHP_CodeSniffer to enforce PSR-12 coding standards and maintain code quality.
+
+**Check code style:**
+```bash
+docker compose exec app php vendor/bin/phpcs
+```
+
+**Automatically fix code style issues:**
+```bash
+docker compose exec app php vendor/bin/phpcbf
+```
+
+**Check specific file or directory:**
+```bash
+docker compose exec app php vendor/bin/phpcs src/Controllers/
+```
+
+**Configuration:** `phpcs.xml` - Configured for PSR-12 with custom rules for line length and migration files.
+
 ## Project Structure
 
 ```
 time-cube-dashboard/
+├── bin/
+│   ├── migrations              # Doctrine migrations CLI
+│   ├── phpcs                   # PHP_CodeSniffer wrapper
+│   └── phpcbf                  # PHP Code Beautifier wrapper
 ├── config/
 │   └── routes.php              # All route definitions
 ├── database/
@@ -169,10 +197,14 @@ time-cube-dashboard/
 │   ├── layout.twig             # Main layout with sidebar
 │   ├── auth_layout.twig        # Authentication layout
 │   └── [feature]/              # Feature-specific templates
+├── .gitignore
 ├── composer.json               # PHP dependencies
-├── Dockerfile                  # Container configuration
 ├── docker-compose.yml          # Service orchestration
-└── Makefile                    # Development shortcuts
+├── Dockerfile                  # Container configuration
+├── Makefile                    # Development shortcuts
+├── phpcs.xml                   # PHP_CodeSniffer configuration
+├── migrations.php              # Doctrine migrations bootstrap
+└── migrations-config.php       # Doctrine migrations config
 ```
 
 ## API Documentation

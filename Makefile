@@ -1,4 +1,4 @@
-.PHONY: up start stop cli
+.PHONY: up start stop cli phpcs phpcbf test-code
 
 up:
 	docker compose up -d --build
@@ -11,3 +11,12 @@ stop:
 
 cli:
 	docker compose exec app bash
+
+phpcs:
+	docker compose exec app php vendor/bin/phpcs
+
+phpcbf:
+	docker compose exec app php vendor/bin/phpcbf
+
+test-code: phpcs
+	@echo "Code style check completed"

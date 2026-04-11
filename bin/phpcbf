@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# PHP Code Beautifier and Fixer wrapper script
+
+# Run phpcbf with all arguments passed through
+php vendor/bin/phpcbf "$@"
