@@ -21,9 +21,9 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 ## Tech Stack
 
 - **Backend**: PHP 8.3 (custom MVC framework)
-- **Database**: SQLite with PDO
+- **Database**: SQLite with Doctrine DBAL
 - **Templating**: Twig 3.x
-- **Session Management**: Symfony HTTP Foundation (Session component)
+- **HTTP Foundation**: Symfony HTTP Foundation (Request/Response/Session)
 - **Frontend**: Vanilla JavaScript, CSS (no build tools)
 - **Containerization**: Docker & Docker Compose
 - **Web Server**: Apache with mod_rewrite
@@ -34,7 +34,7 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 ### Custom MVC Framework
 All core components are hand-rolled in `src/Core/`:
 - **Router** - Pattern-based routing with parameter extraction using Symfony Request/Response
-- **Database** - SQLite singleton with auto-schema initialization
+- **Database** - Doctrine DBAL wrapper with SQLite, providing query builder and schema management
 - **Auth** - Session-based authentication with API token support
 - **Controller** - Base controller with Request/Response handling, auth helpers, and Twig rendering
 

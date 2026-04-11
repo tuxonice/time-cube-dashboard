@@ -25,16 +25,17 @@ class ApiToken
     public static function create(int $userId, string $name): string
     {
         $token = bin2hex(random_bytes(32));
-        Database::getInstance()->query(
-            'INSERT INTO api_tokens (user_id, token, name) VALUES (?, ?, ?)',
-            [$userId, $token, $name]
-        );
+        Database::getInstance()->insert('api_tokens', [
+            'user_id' => $userId,
+            'token' => $token,
+            'name' => $name
+        ]);
         return $token;
     }
 
     public static function delete(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM api_tokens WHERE id = ?', [$id]);
+        Database::getInstance()->delete('api_tokens', ['id' => $id]);
     }
 
     public static function find(int $id): ?array

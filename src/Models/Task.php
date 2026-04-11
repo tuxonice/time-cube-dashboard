@@ -38,23 +38,24 @@ class Task
 
     public static function create(int $projectId, string $name, ?string $description): int
     {
-        Database::getInstance()->query(
-            'INSERT INTO tasks (project_id, name, description) VALUES (?, ?, ?)',
-            [$projectId, $name, $description]
-        );
+        Database::getInstance()->insert('tasks', [
+            'project_id' => $projectId,
+            'name' => $name,
+            'description' => $description
+        ]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function update(int $id, string $name, ?string $description): void
     {
-        Database::getInstance()->query(
-            'UPDATE tasks SET name = ?, description = ? WHERE id = ?',
-            [$name, $description, $id]
-        );
+        Database::getInstance()->update('tasks', [
+            'name' => $name,
+            'description' => $description
+        ], ['id' => $id]);
     }
 
     public static function delete(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM tasks WHERE id = ?', [$id]);
+        Database::getInstance()->delete('tasks', ['id' => $id]);
     }
 }

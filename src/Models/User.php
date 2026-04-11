@@ -18,34 +18,27 @@ class User
 
     public static function create(string $username, string $password): int
     {
-        Database::getInstance()->query(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
-            [$username, password_hash($password, PASSWORD_DEFAULT)]
-        );
+        Database::getInstance()->insert('users', [
+            'username' => $username,
+            'password' => password_hash($password, PASSWORD_DEFAULT)
+        ]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function updateUsername(int $id, string $username): void
     {
-        Database::getInstance()->query(
-            'UPDATE users SET username = ? WHERE id = ?',
-            [$username, $id]
-        );
+        Database::getInstance()->update('users', ['username' => $username], ['id' => $id]);
     }
 
     public static function updatePassword(int $id, string $password): void
     {
-        Database::getInstance()->query(
-            'UPDATE users SET password = ? WHERE id = ?',
-            [password_hash($password, PASSWORD_DEFAULT), $id]
-        );
+        Database::getInstance()->update('users', [
+            'password' => password_hash($password, PASSWORD_DEFAULT)
+        ], ['id' => $id]);
     }
 
     public static function updateAvatar(int $id, ?string $avatar): void
     {
-        Database::getInstance()->query(
-            'UPDATE users SET avatar = ? WHERE id = ?',
-            [$avatar, $id]
-        );
+        Database::getInstance()->update('users', ['avatar' => $avatar], ['id' => $id]);
     }
 }

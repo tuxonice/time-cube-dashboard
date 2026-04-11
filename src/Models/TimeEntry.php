@@ -48,7 +48,7 @@ class TimeEntry
 
     public static function start(int $taskId, int $userId): int
     {
-        Database::getInstance()->query(
+        Database::getInstance()->executeStatement(
             'INSERT INTO time_entries (task_id, user_id, started_at) VALUES (?, ?, datetime(\'now\'))',
             [$taskId, $userId]
         );
@@ -57,7 +57,7 @@ class TimeEntry
 
     public static function stop(int $id): void
     {
-        Database::getInstance()->query(
+        Database::getInstance()->executeStatement(
             'UPDATE time_entries SET stopped_at = datetime(\'now\'),
              duration = CAST((julianday(datetime(\'now\')) - julianday(started_at)) * 86400 AS INTEGER)
              WHERE id = ?',
@@ -67,16 +67,18 @@ class TimeEntry
 
     public static function createManual(int $taskId, int $userId, int $duration, ?string $description): int
     {
-        Database::getInstance()->query(
-            'INSERT INTO time_entries (task_id, user_id, duration, description) VALUES (?, ?, ?, ?)',
-            [$taskId, $userId, $duration, $description]
-        );
+        Database::getInstance()->insert('time_entries', [
+            'task_id' => $taskId,
+            'user_id' => $userId,
+            'duration' => $duration,
+            'description' => $description
+        ]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function delete(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM time_entries WHERE id = ?', [$id]);
+        Database::getInstance()->delete('time_entries', ['id' => $id]);
     }
 
     public static function totalForTask(int $taskId): int

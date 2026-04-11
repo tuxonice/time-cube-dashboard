@@ -25,23 +25,24 @@ class Project
 
     public static function create(int $userId, string $name, ?string $description): int
     {
-        Database::getInstance()->query(
-            'INSERT INTO projects (user_id, name, description) VALUES (?, ?, ?)',
-            [$userId, $name, $description]
-        );
+        Database::getInstance()->insert('projects', [
+            'user_id' => $userId,
+            'name' => $name,
+            'description' => $description
+        ]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function update(int $id, string $name, ?string $description): void
     {
-        Database::getInstance()->query(
-            'UPDATE projects SET name = ?, description = ? WHERE id = ?',
-            [$name, $description, $id]
-        );
+        Database::getInstance()->update('projects', [
+            'name' => $name,
+            'description' => $description
+        ], ['id' => $id]);
     }
 
     public static function delete(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM projects WHERE id = ?', [$id]);
+        Database::getInstance()->delete('projects', ['id' => $id]);
     }
 }

@@ -2,20 +2,23 @@
 
 namespace App\Core;
 
-use PDO;
-use PDOStatement;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Result;
 
 class Database
 {
     private static ?Database $instance = null;
-    private PDO $pdo;
+    private Connection $connection;
 
     private function __construct(string $path)
     {
-        $this->pdo = new PDO("sqlite:$path");
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $this->pdo->exec('PRAGMA foreign_keys = ON');
+        $connectionParams = [
+            'driver' => 'pdo_sqlite',
+            'path' => $path,
+        ];
+        $this->connection = DriverManager::getConnection($connectionParams);
+        $this->connection->executeStatement('PRAGMA foreign_keys = ON');
     }
 
     public static function getInstance(): self
@@ -31,38 +34,61 @@ class Database
     {
         $db = self::getInstance();
         $schema = file_get_contents(dirname(__DIR__, 2) . '/database/schema.sql');
-        $db->pdo->exec($schema);
+        $db->connection->executeStatement($schema);
 
         // Migrations
         $columns = array_column(
-            $db->pdo->query('PRAGMA table_info(users)')->fetchAll(\PDO::FETCH_ASSOC),
+            $db->connection->executeQuery('PRAGMA table_info(users)')->fetchAllAssociative(),
             'name'
         );
         if (!in_array('avatar', $columns)) {
-            $db->pdo->exec('ALTER TABLE users ADD COLUMN avatar TEXT');
+            $db->connection->executeStatement('ALTER TABLE users ADD COLUMN avatar TEXT');
         }
     }
 
-    public function query(string $sql, array $params = []): PDOStatement
+    public function query(string $sql, array $params = []): Result
     {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        return $this->connection->executeQuery($sql, $params);
     }
 
     public function fetch(string $sql, array $params = []): ?array
     {
-        $result = $this->query($sql, $params)->fetch();
+        $result = $this->query($sql, $params)->fetchAssociative();
         return $result ?: null;
     }
 
     public function fetchAll(string $sql, array $params = []): array
     {
-        return $this->query($sql, $params)->fetchAll();
+        return $this->query($sql, $params)->fetchAllAssociative();
     }
 
     public function lastInsertId(): int
     {
-        return (int) $this->pdo->lastInsertId();
+        return (int) $this->connection->lastInsertId();
+    }
+
+    public function getConnection(): Connection
+    {
+        return $this->connection;
+    }
+
+    public function executeStatement(string $sql, array $params = []): int
+    {
+        return $this->connection->executeStatement($sql, $params);
+    }
+
+    public function insert(string $table, array $data): int
+    {
+        return $this->connection->insert($table, $data);
+    }
+
+    public function update(string $table, array $data, array $criteria): int
+    {
+        return $this->connection->update($table, $data, $criteria);
+    }
+
+    public function delete(string $table, array $criteria): int
+    {
+        return $this->connection->delete($table, $criteria);
     }
 }

@@ -29,16 +29,17 @@ class CubeConfig
 
     public static function createCube(int $userId, string $cubeId, string $name): int
     {
-        Database::getInstance()->query(
-            'INSERT INTO cubes (user_id, cube_id, name) VALUES (?, ?, ?)',
-            [$userId, $cubeId, $name]
-        );
+        Database::getInstance()->insert('cubes', [
+            'user_id' => $userId,
+            'cube_id' => $cubeId,
+            'name' => $name
+        ]);
         return Database::getInstance()->lastInsertId();
     }
 
     public static function deleteCube(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM cubes WHERE id = ?', [$id]);
+        Database::getInstance()->delete('cubes', ['id' => $id]);
     }
 
     // --- Face Mappings ---
@@ -58,7 +59,7 @@ class CubeConfig
 
     public static function saveMapping(int $cubeDbId, string $faceColor, int $taskId): void
     {
-        Database::getInstance()->query(
+        Database::getInstance()->executeStatement(
             'INSERT INTO cube_face_mappings (cube_id, face_color, task_id)
              VALUES (?, ?, ?)
              ON CONFLICT(cube_id, face_color)
@@ -69,7 +70,7 @@ class CubeConfig
 
     public static function deleteMapping(int $id): void
     {
-        Database::getInstance()->query('DELETE FROM cube_face_mappings WHERE id = ?', [$id]);
+        Database::getInstance()->delete('cube_face_mappings', ['id' => $id]);
     }
 
     public static function findTaskByFace(string $cubeIdentifier, string $faceColor): ?array
