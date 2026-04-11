@@ -2,16 +2,20 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Router
 {
     private array $routes = [];
     private SessionInterface $session;
+    private Request $request;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(SessionInterface $session, Request $request)
     {
         $this->session = $session;
+        $this->request = $request;
     }
 
     public function add(string $method, string $path, string $controller, string $action): void
@@ -34,10 +38,10 @@ class Router
         $this->add('POST', $path, $controller, $action);
     }
 
-    public function dispatch(string $method, string $uri): void
+    public function dispatch(): ?Response
     {
-        $method = strtoupper($method);
-        $uri = parse_url($uri, PHP_URL_PATH);
+        $method = strtoupper($this->request->getMethod());
+        $uri = $this->request->getPathInfo();
         $uri = rtrim($uri, '/') ?: '/';
 
         foreach ($this->routes as $route) {
@@ -55,25 +59,20 @@ class Router
                 $action = $route['action'];
 
                 if (!class_exists($controllerClass)) {
-                    http_response_code(500);
-                    echo "Controller {$controllerClass} not found";
-                    return;
+                    return new Response("Controller {$controllerClass} not found", 500);
                 }
 
-                $controller = new $controllerClass($this->session);
+                $controller = new $controllerClass($this->session, $this->request);
 
                 if (!method_exists($controller, $action)) {
-                    http_response_code(500);
-                    echo "Action {$action} not found in {$controllerClass}";
-                    return;
+                    return new Response("Action {$action} not found in {$controllerClass}", 500);
                 }
 
-                $controller->$action(...array_values($params));
-                return;
+                $response = $controller->$action(...array_values($params));
+                return $response instanceof Response ? $response : new Response('');
             }
         }
 
-        http_response_code(404);
-        echo "404 Not Found";
+        return new Response('404 Not Found', 404);
     }
 }

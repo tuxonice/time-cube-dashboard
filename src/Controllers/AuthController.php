@@ -5,18 +5,19 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\User;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function loginForm(): void
+    public function loginForm(): Response
     {
         if (Auth::check()) {
-            $this->redirect('/');
+            return $this->redirect('/');
         }
-        $this->render('auth/login.twig');
+        return $this->render('auth/login.twig');
     }
 
-    public function login(): void
+    public function login(): Response
     {
         $username = trim($this->post('username', ''));
         $password = $this->post('password', '');
@@ -25,22 +26,22 @@ class AuthController extends Controller
 
         if (!$user || !password_verify($password, $user['password'])) {
             $this->flash('error', 'Invalid username or password.');
-            $this->redirect('/login');
+            return $this->redirect('/login');
         }
 
         Auth::login($user);
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 
-    public function registerForm(): void
+    public function registerForm(): Response
     {
         if (Auth::check()) {
-            $this->redirect('/');
+            return $this->redirect('/');
         }
-        $this->render('auth/register.twig');
+        return $this->render('auth/register.twig');
     }
 
-    public function register(): void
+    public function register(): Response
     {
         $username = trim($this->post('username', ''));
         $password = $this->post('password', '');
@@ -48,33 +49,33 @@ class AuthController extends Controller
 
         if (strlen($username) < 3) {
             $this->flash('error', 'Username must be at least 3 characters.');
-            $this->redirect('/register');
+            return $this->redirect('/register');
         }
 
         if (strlen($password) < 6) {
             $this->flash('error', 'Password must be at least 6 characters.');
-            $this->redirect('/register');
+            return $this->redirect('/register');
         }
 
         if ($password !== $passwordConfirm) {
             $this->flash('error', 'Passwords do not match.');
-            $this->redirect('/register');
+            return $this->redirect('/register');
         }
 
         if (User::findByUsername($username)) {
             $this->flash('error', 'Username already taken.');
-            $this->redirect('/register');
+            return $this->redirect('/register');
         }
 
         $id = User::create($username, $password);
         Auth::login(['id' => $id, 'username' => $username]);
         $this->flash('success', 'Account created successfully.');
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 
-    public function logout(): void
+    public function logout(): Response
     {
         Auth::logout();
-        $this->redirect('/login');
+        return $this->redirect('/login');
     }
 }

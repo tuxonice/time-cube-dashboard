@@ -6,12 +6,15 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Models\TimeEntry;
+use Symfony\Component\HttpFoundation\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): void
+    public function index(): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $userId = Auth::userId();
         $db = Database::getInstance();
 
@@ -51,7 +54,7 @@ class DashboardController extends Controller
             [$userId]
         );
 
-        $this->render('dashboard/index.twig', [
+        return $this->render('dashboard/index.twig', [
             'projects' => $projects,
             'total_seconds' => (int) $overall['total'],
             'today_seconds' => $todayTotal,

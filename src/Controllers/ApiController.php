@@ -5,17 +5,21 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\CubeConfig;
 use App\Models\TimeEntry;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiController extends Controller
 {
-    public function cube(): void
+    public function cube(): JsonResponse
     {
         $token = $this->requireApiToken();
+        if ($token instanceof JsonResponse) {
+            return $token;
+        }
         $userId = $token['user_id'];
 
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = json_decode($this->request->getContent(), true);
         if (!$input || empty($input['cubeId']) || empty($input['face'])) {
-            $this->json(['error' => 'Missing cubeId or face'], 400);
+            return $this->json(['error' => 'Missing cubeId or face'], 400);
         }
 
         $cubeId = $input['cubeId'];
@@ -24,11 +28,11 @@ class ApiController extends Controller
         // Look up which task this cube face maps to
         $mapping = CubeConfig::findTaskByFace($cubeId, $faceColor);
         if (!$mapping) {
-            $this->json(['error' => 'No task mapped for this cube/face'], 404);
+            return $this->json(['error' => 'No task mapped for this cube/face'], 404);
         }
 
         if ($mapping['user_id'] !== $userId) {
-            $this->json(['error' => 'Unauthorized'], 403);
+            return $this->json(['error' => 'Unauthorized'], 403);
         }
 
         // Stop any running timer for this user
@@ -36,7 +40,7 @@ class ApiController extends Controller
         if ($running) {
             // If already tracking the same task, just confirm
             if ($running['task_id'] === $mapping['task_id']) {
-                $this->json([
+                return $this->json([
                     'status' => 'already_running',
                     'task' => $mapping['task_name'],
                     'project' => $mapping['project_name'],
@@ -48,7 +52,7 @@ class ApiController extends Controller
         // Start new timer
         $entryId = TimeEntry::start($mapping['task_id'], $userId);
 
-        $this->json([
+        return $this->json([
             'status' => 'started',
             'time_entry_id' => $entryId,
             'task' => $mapping['task_name'],

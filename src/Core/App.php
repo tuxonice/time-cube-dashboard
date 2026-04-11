@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
@@ -9,17 +10,21 @@ class App
 {
     private Router $router;
     private Session $session;
+    private Request $request;
 
     public function __construct()
     {
+        $this->request = Request::createFromGlobals();
+        
         $this->session = new Session(new NativeSessionStorage());
         $this->session->start();
+        $this->request->setSession($this->session);
 
         Auth::setSession($this->session);
 
         Database::init();
 
-        $this->router = new Router($this->session);
+        $this->router = new Router($this->session, $this->request);
         $this->loadRoutes();
     }
 
@@ -31,9 +36,10 @@ class App
 
     public function run(): void
     {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $uri = $_SERVER['REQUEST_URI'];
-
-        $this->router->dispatch($method, $uri);
+        $response = $this->router->dispatch();
+        
+        if ($response) {
+            $response->send();
+        }
     }
 }

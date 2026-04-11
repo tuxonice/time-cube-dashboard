@@ -5,59 +5,70 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\Project;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProjectController extends Controller
 {
-    public function index(): void
+    public function index(): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $projects = Project::allForUser(Auth::userId());
-        $this->render('projects/index.twig', ['projects' => $projects]);
+        return $this->render('projects/index.twig', ['projects' => $projects]);
     }
 
-    public function create(): void
+    public function create(): Response
     {
-        $this->requireAuth();
-        $this->render('projects/create.twig');
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
+        return $this->render('projects/create.twig');
     }
 
-    public function store(): void
+    public function store(): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $name = trim($this->post('name', ''));
         $description = trim($this->post('description', ''));
 
         if ($name === '') {
             $this->flash('error', 'Project name is required.');
-            $this->redirect('/projects/create');
+            return $this->redirect('/projects/create');
         }
 
         Project::create(Auth::userId(), $name, $description ?: null);
         $this->flash('success', 'Project created.');
-        $this->redirect('/projects');
+        return $this->redirect('/projects');
     }
 
-    public function edit(string $id): void
+    public function edit(string $id): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $project = Project::find((int) $id);
 
         if (!$project || $project['user_id'] !== Auth::userId()) {
             $this->flash('error', 'Project not found.');
-            $this->redirect('/projects');
+            return $this->redirect('/projects');
         }
 
-        $this->render('projects/edit.twig', ['project' => $project]);
+        return $this->render('projects/edit.twig', ['project' => $project]);
     }
 
-    public function update(string $id): void
+    public function update(string $id): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $project = Project::find((int) $id);
 
         if (!$project || $project['user_id'] !== Auth::userId()) {
             $this->flash('error', 'Project not found.');
-            $this->redirect('/projects');
+            return $this->redirect('/projects');
         }
 
         $name = trim($this->post('name', ''));
@@ -65,26 +76,28 @@ class ProjectController extends Controller
 
         if ($name === '') {
             $this->flash('error', 'Project name is required.');
-            $this->redirect("/projects/{$id}/edit");
+            return $this->redirect("/projects/{$id}/edit");
         }
 
         Project::update((int) $id, $name, $description ?: null);
         $this->flash('success', 'Project updated.');
-        $this->redirect('/projects');
+        return $this->redirect('/projects');
     }
 
-    public function delete(string $id): void
+    public function delete(string $id): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $project = Project::find((int) $id);
 
         if (!$project || $project['user_id'] !== Auth::userId()) {
             $this->flash('error', 'Project not found.');
-            $this->redirect('/projects');
+            return $this->redirect('/projects');
         }
 
         Project::delete((int) $id);
         $this->flash('success', 'Project deleted.');
-        $this->redirect('/projects');
+        return $this->redirect('/projects');
     }
 }

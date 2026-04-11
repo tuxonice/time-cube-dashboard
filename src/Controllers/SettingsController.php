@@ -5,43 +5,50 @@ namespace App\Controllers;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Models\ApiToken;
+use Symfony\Component\HttpFoundation\Response;
 
 class SettingsController extends Controller
 {
-    public function index(): void
+    public function index(): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $tokens = ApiToken::allForUser(Auth::userId());
-        $this->render('settings/index.twig', ['tokens' => $tokens]);
+        return $this->render('settings/index.twig', ['tokens' => $tokens]);
     }
 
-    public function createToken(): void
+    public function createToken(): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $name = trim($this->post('name', ''));
 
         if ($name === '') {
             $this->flash('error', 'Token name is required.');
-            $this->redirect('/settings');
+            return $this->redirect('/settings');
         }
 
         $token = ApiToken::create(Auth::userId(), $name);
         $this->flash('success', "Token created: {$token} — copy it now, it won't be shown again.");
-        $this->redirect('/settings');
+        return $this->redirect('/settings');
     }
 
-    public function deleteToken(string $id): void
+    public function deleteToken(string $id): Response
     {
-        $this->requireAuth();
+        if ($redirect = $this->requireAuth()) {
+            return $redirect;
+        }
         $token = ApiToken::find((int) $id);
 
         if (!$token || $token['user_id'] !== Auth::userId()) {
             $this->flash('error', 'Token not found.');
-            $this->redirect('/settings');
+            return $this->redirect('/settings');
         }
 
         ApiToken::delete((int) $id);
         $this->flash('success', 'Token deleted.');
-        $this->redirect('/settings');
+        return $this->redirect('/settings');
     }
 }

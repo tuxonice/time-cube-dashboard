@@ -33,15 +33,17 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 
 ### Custom MVC Framework
 All core components are hand-rolled in `src/Core/`:
-- **Router** - Pattern-based routing with parameter extraction
+- **Router** - Pattern-based routing with parameter extraction using Symfony Request/Response
 - **Database** - SQLite singleton with auto-schema initialization
 - **Auth** - Session-based authentication with API token support
-- **Controller** - Base controller with auth helpers and Twig rendering
+- **Controller** - Base controller with Request/Response handling, auth helpers, and Twig rendering
 
 ### Request Flow
 ```
-public/index.php → App::run() → Router::dispatch() → Controller → Twig/JSON response
+public/index.php → App::run() → Request::createFromGlobals() → Router::dispatch() → Controller → Response::send()
 ```
+
+All controllers return Symfony Response objects (Response, RedirectResponse, or JsonResponse), providing a clean abstraction over raw PHP output.
 
 ### Data Model
 ```
