@@ -306,6 +306,31 @@ docker compose exec app php bin/migrations status
 docker compose exec app php bin/migrations migrate
 ```
 
+### Static Analysis with PHPStan
+
+Run PHPStan to analyze code for potential bugs and type errors:
+
+```bash
+# Run PHPStan analysis
+docker compose exec app composer phpstan
+
+# Generate baseline (ignore existing errors)
+docker compose exec app composer phpstan:baseline
+```
+
+**Configuration:**
+- Level: 6 (out of 9, good balance between strictness and practicality)
+- Analyzes: `src/` directory
+- Config file: `phpstan.neon`
+
+**What PHPStan checks:**
+- Type safety and type hints
+- Undefined variables and methods
+- Dead code detection
+- Incorrect method signatures
+- Array access on non-arrays
+- And much more...
+
 **Generate a new migration:**
 ```bash
 docker compose exec app php bin/migrations generate

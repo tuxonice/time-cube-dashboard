@@ -34,24 +34,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         $section = $this->post('section', '');
 
-        if ($section === 'username') {
-            $username = trim($this->post('username', ''));
-
-            if (strlen($username) < 3) {
-                $this->flash('error', 'Username must be at least 3 characters.');
-                return $this->redirect('/profile');
-            }
-
-            if ($username !== $user['username']) {
-                if (User::findByUsername($username)) {
-                    $this->flash('error', 'Username already taken.');
-                    return $this->redirect('/profile');
-                }
-                User::updateUsername($user['id'], $username);
-                $this->session->set('username', $username);
-                $this->flash('success', 'Username updated.');
-            }
-        } elseif ($section === 'password') {
+        if ($section === 'password') {
             $current = $this->post('current_password', '');
             $new     = $this->post('new_password', '');
             $confirm = $this->post('new_password_confirm', '');
@@ -72,7 +55,7 @@ class ProfileController extends Controller
                 return $this->redirect('/profile');
             }
 
-            User::updatePassword($user['id'], $new);
+            User::update($user['id'], ['password' => password_hash($new, PASSWORD_DEFAULT)]);
             $this->flash('success', 'Password updated.');
         } elseif ($section === 'profile') {
             $name = $this->post('name');
