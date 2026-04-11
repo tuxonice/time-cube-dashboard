@@ -20,16 +20,105 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 
 ## Tech Stack
 
-- **Backend**: PHP 8.3 (custom MVC framework)
+- **Backend**: PHP 8.3 (custom MVC framework with middleware)
 - **Database**: SQLite with Doctrine DBAL
+- **Database Migrations**: Doctrine Migrations
+- **Code Quality**: PHP_CodeSniffer (PSR-12)
 - **Templating**: Twig 3.x
 - **HTTP Foundation**: Symfony HTTP Foundation (Request/Response/Session)
+- **Caching**: Symfony Cache (FilesystemAdapter)
 - **Frontend**: Vanilla JavaScript, CSS (no build tools)
-- **Containerization**: Docker & Docker Compose
+- **Containerization**: Docker & Docker Compose (Laravel Sail-style user mapping)
 - **Web Server**: Apache with mod_rewrite
 - **UI Design**: Based on [Clean Board](https://github.com/tuxonice/clean-board)
 
 ## Architecture
+
+### Middleware System
+
+The application uses a flexible middleware pipeline for request handling. Middleware can short-circuit requests (e.g., redirect unauthenticated users) or pass data to controllers.
+
+**Available Middleware:**
+- `AuthMiddleware` - Requires user to be logged in (session-based)
+- `GuestMiddleware` - Requires user to NOT be logged in (redirects authenticated users)
+- `ApiTokenMiddleware` - Requires valid API token via `X-Time-Cube-Token` header
+- `CorsMiddleware` - Adds CORS headers to responses (for API endpoints)
+- `GeoIpMiddleware` - Restricts access based on visitor's country (uses ip-api.com)
+
+**How it works:**
+```php
+// In src/Core/App.php - Global middleware (runs on ALL routes)
+$router->addGlobalMiddleware(\App\Core\Middleware\CorsMiddleware::class);
+
+// In routes.php - Route-specific middleware
+$router->get('/profile', 'ProfileController', 'show', [AuthMiddleware::class]);
+$router->post('/api/cube', 'ApiController', 'cube', [ApiTokenMiddleware::class]);
+```
+
+**Middleware execution flow:**
+1. Request arrives at Router
+2. Router matches route and builds middleware stack
+3. Global middleware executes first (if any)
+4. Route-specific middleware executes second
+5. Middleware can return Response (short-circuit) or null (continue)
+6. If all middleware pass, controller action executes
+7. Response returned to client
+
+**Global middleware:**
+Middleware that runs on every single route without needing to specify it in each route definition.
+
+```php
+// In src/Core/App.php
+$router->addGlobalMiddleware(\App\Core\Middleware\CorsMiddleware::class);
+$router->addGlobalMiddleware(\App\Core\Middleware\LoggingMiddleware::class);
+
+// Now ALL routes will have CORS and Logging middleware
+```
+
+**Use cases for global middleware:**
+- CORS headers for API endpoints
+- Request/response logging
+- Security headers
+- Rate limiting
+- Request ID generation
+- Geographic access control
+
+**Example: Geographic access control**
+```php
+// In .env file
+ALLOWED_COUNTRIES=US,GB,DE,FR,ES
+
+// In src/Core/App.php
+$router->addGlobalMiddleware(\App\Core\Middleware\GeoIpMiddleware::class);
+
+// Now only visitors from US, GB, DE, FR, ES can access the site
+// Uses ip-api.com to determine country from IP address
+// Caches results for 1 hour using Symfony Cache (FilesystemAdapter)
+// Automatically allows localhost/private IPs for development
+```
+
+**Creating custom middleware:**
+```php
+namespace App\Core\Middleware;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CustomMiddleware implements MiddlewareInterface
+{
+    public function handle(Request $request, callable $next): ?Response
+    {
+        // Check condition
+        if (!$someCondition) {
+            return new Response('Forbidden', 403); // Short-circuit
+        }
+        
+        // Add data to request for controller
+        $request->attributes->set('custom_data', $value);
+        
+        return null; // Continue to next middleware
+    }
+}
 
 ### Custom MVC Framework
 All core components are hand-rolled in `src/Core/`:

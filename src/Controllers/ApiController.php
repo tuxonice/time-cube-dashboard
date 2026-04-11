@@ -11,11 +11,8 @@ class ApiController extends Controller
 {
     public function cube(): JsonResponse
     {
-        $token = $this->requireApiToken();
-        if ($token instanceof JsonResponse) {
-            return $token;
-        }
-        $userId = $token['user_id'];
+        // User ID is provided by ApiTokenMiddleware
+        $userId = $this->request->attributes->get('user_id');
 
         $input = json_decode($this->request->getContent(), true);
         if (!$input || empty($input['cubeId']) || empty($input['face'])) {
