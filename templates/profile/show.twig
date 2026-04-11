@@ -56,22 +56,25 @@
     </div>
 </div>
 
-<!-- Username -->
+<!-- Profile Information -->
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white">
-        <h5 class="mb-0"><i aria-hidden="true" class="bi bi-person me-2"></i>Username</h5>
+        <h5 class="mb-0"><i aria-hidden="true" class="bi bi-person me-2"></i>Profile Information</h5>
     </div>
     <div class="card-body">
         <form method="post" action="/profile">
-            <input type="hidden" name="section" value="username">
+            <input type="hidden" name="section" value="profile">
             <div class="row g-3 align-items-end">
                 <div class="col-md-6">
-                    <label class="form-label" for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control"
-                           value="{{ auth.username }}" minlength="3" required>
+                    <label class="form-label" for="name">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ auth.name }}" required minlength="2">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" value="{{ auth.email }}" required>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-dark">Save</button>
+                    <button type="submit" class="btn btn-dark">Update Profile</button>
                 </div>
             </div>
         </form>

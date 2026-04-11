@@ -70,6 +70,56 @@ class ProfileController extends Controller
 
             User::updatePassword($user['id'], $new);
             $this->flash('success', 'Password updated.');
+        } elseif ($section === 'profile') {
+            $name = $this->post('name');
+            $email = $this->post('email');
+            $password = $this->post('password');
+
+            $updateData = [];
+
+            // Update name if provided
+            if ($name && $name !== $user['name']) {
+                if (strlen($name) < 2) {
+                    $this->flash('error', 'Name must be at least 2 characters');
+                    return $this->redirect('/profile');
+                }
+                $updateData['name'] = $name;
+            }
+
+            // Update email if provided and changed
+            if ($email && $email !== $user['email']) {
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $this->flash('error', 'Invalid email format');
+                    return $this->redirect('/profile');
+                }
+
+                // Check if email already exists
+                $existingUser = User::findByEmail($email);
+                if ($existingUser && $existingUser['id'] !== $user['id']) {
+                    $this->flash('error', 'Email already in use');
+                    return $this->redirect('/profile');
+                }
+
+                $updateData['email'] = $email;
+            }
+
+            // Update password if provided
+            if ($password) {
+                if (strlen($password) < 6) {
+                    $this->flash('error', 'Password must be at least 6 characters');
+                    return $this->redirect('/profile');
+                }
+                $updateData['password'] = password_hash($password, PASSWORD_DEFAULT);
+            }
+
+            if (!empty($updateData)) {
+                User::update($user['id'], $updateData);
+                $this->flash('success', 'Profile updated successfully');
+                
+                // Refresh user data in session
+                $updatedUser = User::find($user['id']);
+                Auth::login($updatedUser);
+            }
         }
 
         return $this->redirect('/profile');

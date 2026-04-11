@@ -24,7 +24,8 @@ class Auth
     public static function login(array $user): void
     {
         self::session()->set('user_id', $user['id']);
-        self::session()->set('username', $user['username']);
+        self::session()->set('email', $user['email']);
+        self::session()->set('name', $user['name']);
         self::session()->set('avatar', $user['avatar'] ?? null);
     }
 
@@ -43,9 +44,14 @@ class Auth
         return self::session()->get('user_id');
     }
 
-    public static function username(): ?string
+    public static function email(): ?string
     {
-        return self::session()->get('username');
+        return self::session()->get('email');
+    }
+
+    public static function name(): ?string
+    {
+        return self::session()->get('name');
     }
 
     public static function user(): ?array
@@ -54,9 +60,10 @@ class Auth
             return null;
         }
         return [
-            'id'       => self::userId(),
-            'username' => self::username(),
-            'avatar'   => self::session()->get('avatar'),
+            'id'     => self::userId(),
+            'email'  => self::email(),
+            'name'   => self::name(),
+            'avatar' => self::session()->get('avatar'),
         ];
     }
 }

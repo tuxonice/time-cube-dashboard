@@ -11,30 +11,34 @@ class User
         return Database::getInstance()->fetch('SELECT * FROM users WHERE id = ?', [$id]);
     }
 
-    public static function findByUsername(string $username): ?array
+    public static function findByEmail(string $email): ?array
     {
-        return Database::getInstance()->fetch('SELECT * FROM users WHERE username = ?', [$username]);
+        $result = Database::getInstance()->fetch(
+            'SELECT * FROM users WHERE email = ?',
+            [$email]
+        );
+        return $result ?: null;
     }
 
-    public static function create(string $username, string $password): int
+    public static function create(string $email, string $name, string $password): int
     {
         Database::getInstance()->insert('users', [
-            'username' => $username,
+            'email' => $email,
+            'name' => $name,
             'password' => password_hash($password, PASSWORD_DEFAULT)
         ]);
         return Database::getInstance()->lastInsertId();
     }
 
-    public static function updateUsername(int $id, string $username): void
+    public static function update(int $id, array $data): void
     {
-        Database::getInstance()->update('users', ['username' => $username], ['id' => $id]);
-    }
-
-    public static function updatePassword(int $id, string $password): void
-    {
-        Database::getInstance()->update('users', [
-            'password' => password_hash($password, PASSWORD_DEFAULT)
-        ], ['id' => $id]);
+        // Only allow updating specific fields
+        $allowedFields = ['name', 'email', 'password', 'avatar'];
+        $updateData = array_intersect_key($data, array_flip($allowedFields));
+        
+        if (!empty($updateData)) {
+            Database::getInstance()->update('users', $updateData, ['id' => $id]);
+        }
     }
 
     public static function updateAvatar(int $id, ?string $avatar): void

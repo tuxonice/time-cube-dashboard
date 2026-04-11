@@ -64,17 +64,17 @@
                 <div class="dropdown">
                     <button class="btn btn-link text-dark p-0 border-0 d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
                         {% if auth.avatar %}
-                            <img src="/uploads/avatars/{{ auth.avatar }}" alt="{{ auth.username }}"
+                            <img src="/uploads/avatars/{{ auth.avatar }}" alt="{{ auth.name }}"
                                  class="rounded-circle border" style="width:32px;height:32px;object-fit:cover;">
                         {% else %}
                             <i aria-hidden="true" class="bi bi-person-circle fs-5"></i>
                         {% endif %}
-                        <span class="d-none d-md-inline small fw-semibold">{{ auth.username }}</span>
+                        <span class="d-none d-md-inline small fw-semibold">{{ auth.name }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li>
                             <div class="px-3 py-2 border-bottom">
-                                <div class="fw-semibold">{{ auth.username }}</div>
+                                <span class="navbar-text me-3">{{ auth.name }}</span>
                             </div>
                         </li>
                         <li>

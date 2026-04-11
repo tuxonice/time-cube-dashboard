@@ -19,13 +19,23 @@ class AuthController extends Controller
 
     public function login(): Response
     {
-        $username = trim($this->post('username', ''));
-        $password = $this->post('password', '');
+        $email = $this->post('email');
+        $password = $this->post('password');
 
-        $user = User::findByUsername($username);
+        if (!$email || !$password) {
+            $this->flash('error', 'Email and password are required');
+            return $this->redirect('/login');
+        }
 
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->flash('error', 'Invalid email format');
+            return $this->redirect('/login');
+        }
+
+        $user = User::findByEmail($email);
         if (!$user || !password_verify($password, $user['password'])) {
-            $this->flash('error', 'Invalid username or password.');
+            $this->flash('error', 'Invalid credentials');
             return $this->redirect('/login');
         }
 
@@ -43,32 +53,42 @@ class AuthController extends Controller
 
     public function register(): Response
     {
-        $username = trim($this->post('username', ''));
+        $email = trim($this->post('email', ''));
+        $name = trim($this->post('name', ''));
         $password = $this->post('password', '');
-        $passwordConfirm = $this->post('password_confirm', '');
 
-        if (strlen($username) < 3) {
-            $this->flash('error', 'Username must be at least 3 characters.');
+        if (!$email || !$name || !$password) {
+            $this->flash('error', 'Email, name, and password are required');
             return $this->redirect('/register');
         }
 
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->flash('error', 'Invalid email format');
+            return $this->redirect('/register');
+        }
+
+        // Validate name length
+        if (strlen($name) < 2) {
+            $this->flash('error', 'Name must be at least 2 characters');
+            return $this->redirect('/register');
+        }
+
+        // Validate password length
         if (strlen($password) < 6) {
-            $this->flash('error', 'Password must be at least 6 characters.');
+            $this->flash('error', 'Password must be at least 6 characters');
             return $this->redirect('/register');
         }
 
-        if ($password !== $passwordConfirm) {
-            $this->flash('error', 'Passwords do not match.');
+        if (User::findByEmail($email)) {
+            $this->flash('error', 'Email already exists');
             return $this->redirect('/register');
         }
 
-        if (User::findByUsername($username)) {
-            $this->flash('error', 'Username already taken.');
-            return $this->redirect('/register');
-        }
+        $userId = User::create($email, $name, $password);
+        $user = User::find($userId);
 
-        $id = User::create($username, $password);
-        Auth::login(['id' => $id, 'username' => $username]);
+        Auth::login($user);
         $this->flash('success', 'Account created successfully.');
         return $this->redirect('/');
     }
