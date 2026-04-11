@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Core\Middleware\GeoIpMiddleware;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -15,6 +16,9 @@ class App
 
     public function __construct()
     {
+        // Load environment variables from .env file
+        $this->loadEnvironment();
+
         $this->request = Request::createFromGlobals();
 
         $this->session = new Session(new NativeSessionStorage());
@@ -27,6 +31,17 @@ class App
 
         $this->router = new Router($this->session, $this->request);
         $this->loadRoutes();
+    }
+
+    private function loadEnvironment(): void
+    {
+        $dotenv = new Dotenv();
+        $envFile = dirname(__DIR__, 2) . '/.env';
+
+        // Load .env file if it exists
+        if (file_exists($envFile)) {
+            $dotenv->load($envFile);
+        }
     }
 
     private function loadRoutes(): void

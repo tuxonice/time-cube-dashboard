@@ -27,6 +27,7 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 - **Templating**: Twig 3.x
 - **HTTP Foundation**: Symfony HTTP Foundation (Request/Response/Session)
 - **Caching**: Symfony Cache (FilesystemAdapter)
+- **Configuration**: Symfony DotEnv (.env file management)
 - **Frontend**: Vanilla JavaScript, CSS (no build tools)
 - **Containerization**: Docker & Docker Compose (Laravel Sail-style user mapping)
 - **Web Server**: Apache with mod_rewrite
@@ -159,24 +160,67 @@ git clone <repository-url>
 cd time-cube-dashboard
 ```
 
-2. **Configure user permissions (recommended)**
+2. **Configure environment variables**
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env and configure your settings
+# - USER_ID/GROUP_ID: Run ./setup-user.sh to auto-configure
+# - ALLOWED_COUNTRIES: Set country codes if using GeoIP middleware (optional)
+```
+
+3. **Configure user permissions (recommended)**
 ```bash
 ./setup-user.sh
 ```
-This creates a `.env` file with your host user ID/group ID to avoid Docker permission issues.
+This automatically adds your host user ID/group ID to `.env` to avoid Docker permission issues.
 
-3. **Start the application**
+4. **Start the application**
 ```bash
 make up
 # or
 docker compose up -d --build
 ```
 
-4. **Access the application**
+5. **Install dependencies**
+```bash
+docker compose exec app composer install
+```
+
+6. **Access the application**
 Open your browser to `http://localhost:8000`
 
-5. **Create an account**
+7. **Create an account**
 Register a new user account through the web interface
+
+### Environment Variables
+
+The application uses Symfony DotEnv to manage configuration via `.env` file:
+
+**Available variables:**
+- `USER_ID` - Host user ID for Docker user mapping (default: 1000)
+- `GROUP_ID` - Host group ID for Docker user mapping (default: 1000)
+- `ALLOWED_COUNTRIES` - Comma-separated country codes for GeoIP middleware (optional)
+
+**Setup:**
+```bash
+# Copy example file
+cp .env.example .env
+
+# Auto-configure Docker user mapping
+./setup-user.sh
+
+# Or manually edit .env
+nano .env
+```
+
+**Example `.env` file:**
+```env
+USER_ID=1000
+GROUP_ID=1000
+ALLOWED_COUNTRIES=US,GB,DE,FR,ES
+```
 
 ### Development Commands
 

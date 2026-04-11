@@ -73,7 +73,7 @@ class GeoIpMiddleware implements MiddlewareInterface
 
     private function getAllowedCountries(): array
     {
-        $countries = getenv('ALLOWED_COUNTRIES') ?: '';
+        $countries = $_ENV['ALLOWED_COUNTRIES'] ?? '';
         
         if (empty($countries)) {
             return [];
