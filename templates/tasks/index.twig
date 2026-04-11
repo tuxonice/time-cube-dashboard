@@ -1,0 +1,84 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'projects' %}
+
+{% block title %}{{ project.name }} — Tasks — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="/projects" class="text-decoration-none">Projects</a></li>
+        <li class="breadcrumb-item active">{{ project.name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h1 class="mb-0">{{ project.name }} <span class="text-muted fs-5">— Tasks</span></h1>
+    <a href="/projects/{{ project.id }}/tasks/create" class="btn btn-dark">
+        <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> New Task
+    </a>
+</div>
+
+{% if tasks is empty %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-list-task text-muted" style="font-size: 2rem;"></i>
+            <p class="text-muted mt-2 mb-0">No tasks yet. Create your first task for this project.</p>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Total Time</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <a href="/tasks/{{ task.id }}/time" class="text-decoration-none fw-semibold">
+                                <i aria-hidden="true" class="bi bi-check2-square me-1"></i> {{ task.name }}
+                            </a>
+                        </td>
+                        <td class="text-muted">{{ task.description ?? '—' }}</td>
+                        <td>{{ (task.total_seconds / 3600)|number_format(1) }}h</td>
+                        <td>
+                            {% if task.has_running %}
+                                <span class="badge bg-success">
+                                    <i aria-hidden="true" class="bi bi-play-fill me-1"></i> Running
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">Idle</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="/tasks/{{ task.id }}/time" class="btn btn-sm btn-outline-primary">
+                                <i aria-hidden="true" class="bi bi-clock"></i>
+                            </a>
+                            <a href="/tasks/{{ task.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                                <i aria-hidden="true" class="bi bi-pencil"></i>
+                            </a>
+                            <form action="/tasks/{{ task.id }}/delete" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this task and all time entries?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i aria-hidden="true" class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

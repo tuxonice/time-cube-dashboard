@@ -1,0 +1,140 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'projects' %}
+
+{% block title %}{{ task.name }} — Time — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="/projects" class="text-decoration-none">Projects</a></li>
+        <li class="breadcrumb-item"><a href="/projects/{{ task.project_id }}/tasks" class="text-decoration-none">{{ task.project_name }}</a></li>
+        <li class="breadcrumb-item active">{{ task.name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h1 class="mb-0">{{ task.name }} <span class="text-muted fs-5">— Time</span></h1>
+    <a href="/tasks/{{ task.id }}/time/create" class="btn btn-outline-dark">
+        <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> Manual Entry
+    </a>
+</div>
+
+<!-- Timer Card -->
+<div class="card shadow-sm border-start border-4 {{ running ? 'border-success' : 'border-secondary' }} mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <div class="text-muted small mb-1">Timer</div>
+            <span class="timer-display {{ running ? 'timer-running' : '' }}" id="timer"
+                  {% if running %}data-started="{{ running.started_at }}"{% endif %}>00:00:00</span>
+        </div>
+        {% if running %}
+            <form action="/time/{{ running.id }}/stop" method="post">
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i aria-hidden="true" class="bi bi-stop-circle me-1"></i> Stop
+                </button>
+            </form>
+        {% else %}
+            <form action="/tasks/{{ task.id }}/time/start" method="post">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i aria-hidden="true" class="bi bi-play-circle me-1"></i> Start
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Total -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width:48px;height:48px;">
+                        <i aria-hidden="true" class="bi bi-clock-history fs-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0">{{ (total_seconds / 3600)|number_format(1) }}h</h2>
+                        <div class="text-muted small">Total Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Entries Table -->
+{% if entries is not empty %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.created_at }}</td>
+                    <td>
+                        {% if entry.duration %}
+                            {{ (entry.duration / 3600)|number_format(0) }}h {{ ((entry.duration % 3600) / 60)|number_format(0) }}m
+                        {% elseif entry.started_at and not entry.stopped_at %}
+                            <span class="badge bg-success">
+                                <i aria-hidden="true" class="bi bi-play-fill me-1"></i> Running
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if entry.started_at %}
+                            <span class="badge bg-primary">Timer</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Manual</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ entry.description ?? '—' }}</td>
+                    <td class="text-end">
+                        {% if entry.started_at and not entry.stopped_at %}
+                            <form action="/time/{{ entry.id }}/stop" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-warning">
+                                    <i aria-hidden="true" class="bi bi-stop-circle"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                        <form action="/time/{{ entry.id }}/delete" method="post" class="d-inline"
+                              onsubmit="return confirm('Delete this time entry?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i aria-hidden="true" class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-clock text-muted" style="font-size: 2rem;"></i>
+        <p class="text-muted mt-2 mb-0">No time entries yet. Start the timer or add a manual entry.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if running %}
+<script src="/js/timer.js"></script>
+{% endif %}
+{% endblock %}

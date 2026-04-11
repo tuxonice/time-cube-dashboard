@@ -1,0 +1,45 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'projects' %}
+
+{% block title %}Add Time — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="/projects" class="text-decoration-none">Projects</a></li>
+        <li class="breadcrumb-item"><a href="/projects/{{ task.project_id }}/tasks" class="text-decoration-none">{{ task.project_name }}</a></li>
+        <li class="breadcrumb-item"><a href="/tasks/{{ task.id }}/time" class="text-decoration-none">{{ task.name }}</a></li>
+        <li class="breadcrumb-item active">Add Time</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h1 class="mt-4 mb-4">Add Manual Time Entry</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="/tasks/{{ task.id }}/time">
+            <div class="row mb-3">
+                <div class="col-auto">
+                    <label class="form-label" for="hours">Hours</label>
+                    <input type="number" id="hours" name="hours" class="form-control" min="0" value="0" style="width: 100px;">
+                </div>
+                <div class="col-auto">
+                    <label class="form-label" for="minutes">Minutes</label>
+                    <input type="number" id="minutes" name="minutes" class="form-control" min="0" max="59" value="0" style="width: 100px;">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="description">Description <span class="text-muted">(optional)</span></label>
+                <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-dark">
+                <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> Add Entry
+            </button>
+            <a href="/tasks/{{ task.id }}/time" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

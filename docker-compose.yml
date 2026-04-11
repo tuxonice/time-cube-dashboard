@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    command: bash -c "chown -R www-data:www-data /var/www/html/database /var/www/html/public/uploads && apache2-foreground"
+    restart: "no"

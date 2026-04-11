@@ -1,0 +1,72 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'projects' %}
+
+{% block title %}Projects — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item active">Projects</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h1 class="mb-0">Projects</h1>
+    <a href="/projects/create" class="btn btn-dark">
+        <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> New Project
+    </a>
+</div>
+
+{% if projects is empty %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-folder-plus text-muted" style="font-size: 2rem;"></i>
+            <p class="text-muted mt-2 mb-0">No projects yet. Create your first project to get started.</p>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Tasks</th>
+                        <th>Total Time</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                    <tr>
+                        <td>
+                            <a href="/projects/{{ project.id }}/tasks" class="text-decoration-none fw-semibold">
+                                <i aria-hidden="true" class="bi bi-folder me-1"></i> {{ project.name }}
+                            </a>
+                        </td>
+                        <td class="text-muted">{{ project.description ?? '—' }}</td>
+                        <td><span class="badge bg-secondary">{{ project.task_count }}</span></td>
+                        <td>{{ (project.total_seconds / 3600)|number_format(1) }}h</td>
+                        <td class="text-end">
+                            <a href="/projects/{{ project.id }}/edit" class="btn btn-sm btn-outline-secondary">
+                                <i aria-hidden="true" class="bi bi-pencil"></i>
+                            </a>
+                            <form action="/projects/{{ project.id }}/delete" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this project and all its tasks?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i aria-hidden="true" class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
