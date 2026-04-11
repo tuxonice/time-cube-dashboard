@@ -331,6 +331,51 @@ docker compose exec app composer phpstan:baseline
 - Array access on non-arrays
 - And much more...
 
+### Testing with Pest PHP
+
+Run tests using Pest, a modern testing framework with elegant syntax:
+
+```bash
+# Run all tests
+docker compose exec app composer test
+
+# Run tests with coverage
+docker compose exec app composer test:coverage
+
+# Run tests in parallel (faster)
+docker compose exec app composer test:parallel
+
+# Run specific test file
+docker compose exec app vendor/bin/pest tests/Unit/ExampleTest.php
+
+# Run tests with filter
+docker compose exec app vendor/bin/pest --filter="user can be created"
+```
+
+**Test Structure:**
+- `tests/Unit/` - Unit tests for individual classes/methods
+- `tests/Feature/` - Feature tests for complete workflows
+- `tests/Pest.php` - Global test configuration
+- `phpunit.xml` - PHPUnit/Pest configuration
+
+**Writing Tests:**
+```php
+// tests/Unit/ExampleTest.php
+test('basic math operations', function () {
+    expect(1 + 1)->toBe(2);
+    expect(10 - 5)->toBe(5);
+});
+
+// tests/Feature/AuthTest.php
+test('password hashing works', function () {
+    $password = 'mySecretPassword';
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    
+    expect($hash)->toBeString();
+    expect(password_verify($password, $hash))->toBeTrue();
+});
+```
+
 **Generate a new migration:**
 ```bash
 docker compose exec app php bin/migrations generate
