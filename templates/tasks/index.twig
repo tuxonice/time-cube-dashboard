@@ -50,7 +50,7 @@
                             </a>
                         </td>
                         <td class="text-muted">{{ task.description ?? '—' }}</td>
-                        <td>{{ (task.total_seconds / 3600)|number_format(1) }}h</td>
+                        <td>{{ (task.total_seconds / 3600)|round(0, 'floor') }}h {{ ((task.total_seconds % 3600) / 60)|round(0, 'floor') }}m</td>
                         <td>
                             {% if task.has_running %}
                                 <span class="badge bg-success">

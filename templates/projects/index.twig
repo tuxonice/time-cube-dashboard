@@ -50,7 +50,7 @@
                         </td>
                         <td class="text-muted">{{ project.description ?? '—' }}</td>
                         <td><span class="badge bg-secondary">{{ project.task_count }}</span></td>
-                        <td>{{ (project.total_seconds / 3600)|number_format(1) }}h</td>
+                        <td>{{ (project.total_seconds / 3600)|round(0, 'floor') }}h {{ ((project.total_seconds % 3600) / 60)|round(0, 'floor') }}m</td>
                         <td class="text-end">
                             <a href="/projects/{{ project.id }}/edit" class="btn btn-sm btn-outline-secondary">
                                 <i aria-hidden="true" class="bi bi-pencil"></i>
