@@ -103,7 +103,7 @@
     <div class="card-body">
         <p class="text-muted small mb-2">The cube sends a single POST to switch tasks:</p>
         <pre class="bg-light p-3 rounded small mb-0">POST /api/cube
-Authorization: Bearer YOUR_TOKEN
+X-Time-Cube-Token: YOUR_TOKEN
 Content-Type: application/json
 
 {"cubeId": "{{ cube.cube_id }}", "face": "yellow"}</pre>

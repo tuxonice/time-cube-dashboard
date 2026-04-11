@@ -30,7 +30,7 @@ There are no build steps, linting tools, or tests — plain PHP/CSS/JS with no f
 
 **Database:** SQLite singleton (`src/Core/Database.php`). Schema auto-initializes from `database/schema.sql` on first connection. The DB file is at `database/app.db` (gitignored, persisted via Docker volume `db-data`).
 
-**Auth:** Session-based (`$_SESSION['user_id']`). Controllers call `$this->requireAuth()` from the base `Controller` class. The API endpoint uses Bearer token auth via `api_tokens` table.
+**Auth:** Session-based (`$_SESSION['user_id']`). Controllers call `$this->requireAuth()` from the base `Controller` class. The API endpoint uses X-Time-Cube-Token token auth via `api_tokens` table.
 
 **Namespace:** All PHP classes are `App\*` (PSR-4, rooted at `src/`).
 

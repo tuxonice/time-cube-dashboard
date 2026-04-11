@@ -16,7 +16,7 @@ A time tracking management system with physical IoT device integration. Track yo
 The system integrates with an ESP32-based physical cube device. Each face of the cube can be mapped to a specific task. When you rotate the cube to a face, it automatically:
 1. Stops any currently running time entry
 2. Starts a new time entry for the task mapped to that face color
-3. Sends data via REST API using Bearer token authentication
+3. Sends data via REST API using X-Time-Cube-Token header token authentication
 
 ## Tech Stack
 
@@ -278,7 +278,7 @@ Receives cube rotation events from the physical device.
 
 **Headers:**
 ```
-Authorization: Bearer <api_token>
+X-Time-Cube-Token: <api_token>
 Content-Type: application/json
 ```
 
@@ -302,7 +302,7 @@ Content-Type: application/json
 ### Authentication
 
 - **Web Interface**: Session-based using Symfony Session component
-- **API**: Bearer token authentication
+- **API**: X-Time-Cube-Token header token authentication
 - Generate API tokens in Settings → API Tokens
 
 ## Database Schema

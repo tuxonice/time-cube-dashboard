@@ -74,11 +74,7 @@ abstract class Controller
 
     protected function requireApiToken(): array|JsonResponse
     {
-        $header = $this->request->headers->get('Authorization', '');
-        $token = '';
-        if (preg_match('/^Bearer\s+(.+)$/i', $header, $matches)) {
-            $token = $matches[1];
-        }
+        $token = $this->request->headers->get('X-Time-Cube-Token', '');
 
         if ($token === '') {
             return $this->json(['error' => 'Missing authorization token'], 401);
