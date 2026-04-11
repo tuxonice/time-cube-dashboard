@@ -1,0 +1,6 @@
+/vendor/
+.idea/
+/.env
+/public/uploads/avatars/
+/storage/database/app.db
+/storage/logs/*.log

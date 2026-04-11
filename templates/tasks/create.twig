@@ -1,0 +1,39 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'projects' %}
+
+{% block title %}New Task — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="/projects" class="text-decoration-none">Projects</a></li>
+        <li class="breadcrumb-item"><a href="/projects/{{ project.id }}/tasks" class="text-decoration-none">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active">New Task</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<h1 class="mt-4 mb-4">New Task</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" action="/projects/{{ project.id }}/tasks">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="mb-3">
+                <label class="form-label" for="name">Name</label>
+                <input type="text" id="name" name="name" class="form-control" required autofocus>
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="description">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-dark">
+                <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> Create Task
+            </button>
+            <a href="/projects/{{ project.id }}/tasks" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'cubes' %}
+
+{% block title %}Cubes — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item active">Cubes</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h1 class="mb-0">Cubes</h1>
+</div>
+
+<p class="text-muted">Register your physical Time Cube devices and map their faces to tasks.</p>
+
+<!-- Register new cube -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0"><i aria-hidden="true" class="bi bi-plus-circle me-2"></i>Register a Cube</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" action="/cubes" class="row g-2 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="col-md-4">
+                <label class="form-label" for="cube_id">Cube ID</label>
+                <input type="text" id="cube_id" name="cube_id" class="form-control" placeholder="e.g. cube-123abc" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="cube_name">Name</label>
+                <input type="text" id="cube_name" name="name" class="form-control" placeholder="e.g. Office Desk Cube" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-dark">
+                    <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> Register
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cube list -->
+{% if cubes is not empty %}
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Cube ID</th>
+                    <th>Mappings</th>
+                    <th>Registered</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cube in cubes %}
+                <tr>
+                    <td>
+                        <a href="/cubes/{{ cube.id }}" class="text-decoration-none fw-semibold">
+                            <i aria-hidden="true" class="bi bi-dice-6 me-1"></i> {{ cube.name }}
+                        </a>
+                    </td>
+                    <td><code>{{ cube.cube_id }}</code></td>
+                    <td><span class="badge bg-secondary">{{ cube.mapping_count }} faces</span></td>
+                    <td class="text-muted">{{ cube.created_at }}</td>
+                    <td class="text-end">
+                        <a href="/cubes/{{ cube.id }}" class="btn btn-sm btn-outline-secondary">
+                            <i aria-hidden="true" class="bi bi-pencil"></i> Configure
+                        </a>
+                        <form action="/cubes/{{ cube.id }}/delete" method="post" class="d-inline"
+                              onsubmit="return confirm('Delete this cube and all its mappings?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i aria-hidden="true" class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-dice-6 text-muted" style="font-size: 2rem;"></i>
+        <p class="text-muted mt-2 mb-0">No cubes registered yet. Register your first device above.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

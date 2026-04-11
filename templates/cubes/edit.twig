@@ -1,0 +1,125 @@
+{% extends "layout.twig" %}
+
+{% set active_page = 'cubes' %}
+
+{% block title %}{{ cube.name }} — Cube Config — Time Cube{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0 small">
+        <li class="breadcrumb-item"><a href="/cubes" class="text-decoration-none">Cubes</a></li>
+        <li class="breadcrumb-item active">{{ cube.name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+    <h1 class="mb-0"><i aria-hidden="true" class="bi bi-dice-6 me-2"></i>{{ cube.name }}</h1>
+</div>
+<p class="text-muted mb-4">Cube ID: <code>{{ cube.cube_id }}</code></p>
+
+<!-- Add face mapping -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0"><i aria-hidden="true" class="bi bi-plus-circle me-2"></i>Add Face Mapping</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" action="/cubes/{{ cube.id }}/mappings" class="row g-2 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="col-md-3">
+                <label class="form-label" for="face_color">Face Color</label>
+                <select id="face_color" name="face_color" class="form-select" required>
+                    <option value="">— Select a color —</option>
+                    {% set mapped_colors = [] %}
+                    {% for m in mappings %}
+                        {% set mapped_colors = mapped_colors|merge([m.face_color]) %}
+                    {% endfor %}
+                    {% for color in ['white','red', 'blue', 'green', 'yellow', 'orange'] %}
+                        {% if color not in mapped_colors %}
+                            <option value="{{ color }}">{{ color|capitalize }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label" for="task_id">Task</label>
+                <select id="task_id" name="task_id" class="form-select" required>
+                    <option value="">— Select a task —</option>
+                    {% for task in tasks %}
+                    <option value="{{ task.id }}">{{ task.project_name }} / {{ task.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-dark">
+                    <i aria-hidden="true" class="bi bi-plus-lg me-1"></i> Add
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Current mappings -->
+{% if mappings is not empty %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h6 class="mb-0">Face Mappings</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Face Color</th>
+                    <th>Project</th>
+                    <th>Task</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mapping in mappings %}
+                <tr>
+                    <td>
+                        <span class="badge bg-dark">{{ mapping.face_color }}</span>
+                    </td>
+                    <td>{{ mapping.project_name }}</td>
+                    <td class="fw-semibold">{{ mapping.task_name }}</td>
+                    <td class="text-end">
+                        <form action="/cubes/{{ cube.id }}/mappings/{{ mapping.id }}/delete" method="post" class="d-inline"
+                              onsubmit="return confirm('Remove this mapping?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i aria-hidden="true" class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-palette text-muted" style="font-size: 2rem;"></i>
+        <p class="text-muted mt-2 mb-0">No face mappings yet. Add one above to link a face color to a task.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- API usage -->
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0"><i aria-hidden="true" class="bi bi-info-circle me-2"></i>API Usage</h6>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-2">The cube sends a single POST to switch tasks:</p>
+        <pre class="bg-light p-3 rounded small mb-0">POST /api/cube
+X-Time-Cube-Token: YOUR_TOKEN
+Content-Type: application/json
+
+{"cubeId": "{{ cube.cube_id }}", "face": "yellow"}</pre>
+    </div>
+</div>
+{% endblock %}
