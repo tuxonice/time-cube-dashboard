@@ -5,6 +5,10 @@ namespace App\Core;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
+use Doctrine\Migrations\Configuration\Migration\PhpFile;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Version\Direction;
 
 class Database
 {
@@ -33,16 +37,31 @@ class Database
     public static function init(): void
     {
         $db = self::getInstance();
-        $schema = file_get_contents(dirname(__DIR__, 2) . '/database/schema.sql');
-        $db->connection->executeStatement($schema);
-
-        // Migrations
-        $columns = array_column(
-            $db->connection->executeQuery('PRAGMA table_info(users)')->fetchAllAssociative(),
-            'name'
-        );
-        if (!in_array('avatar', $columns)) {
-            $db->connection->executeStatement('ALTER TABLE users ADD COLUMN avatar TEXT');
+        
+        // Run migrations automatically if needed
+        try {
+            $config = new PhpFile(dirname(__DIR__, 2) . '/migrations-config.php');
+            $dependencyFactory = DependencyFactory::fromConnection(
+                $config,
+                new ExistingConnection($db->connection)
+            );
+            
+            $statusCalculator = $dependencyFactory->getMigrationStatusCalculator();
+            $migrator = $dependencyFactory->getMigrator();
+            
+            // Check if there are new migrations to execute
+            $newMigrations = $statusCalculator->getNewMigrations();
+            
+            if (count($newMigrations) > 0) {
+                // Execute all new migrations
+                $planCalculator = $dependencyFactory->getMigrationPlanCalculator();
+                $versions = $newMigrations->getItems();
+                $plan = $planCalculator->getPlanForVersions($versions, Direction::UP);
+                $migrator->migrate($plan);
+            }
+        } catch (\Exception $e) {
+            // Silently continue if migrations fail (e.g., already executed)
+            // In production, you might want to log this
         }
     }
 

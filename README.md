@@ -98,6 +98,34 @@ make cli      # Open bash shell inside the app container
 docker compose exec app composer install
 ```
 
+### Database Migrations
+
+The project uses Doctrine Migrations for database schema management. Migrations run automatically on application startup, but you can also manage them manually.
+
+**Check migration status:**
+```bash
+docker compose exec app php bin/migrations status
+```
+
+**Run pending migrations:**
+```bash
+docker compose exec app php bin/migrations migrate
+```
+
+**Generate a new migration:**
+```bash
+docker compose exec app php bin/migrations generate
+```
+
+**List all migrations:**
+```bash
+docker compose exec app php bin/migrations list
+```
+
+**Migration files location:** `database/migrations/`
+
+The database schema is version-controlled through migrations, eliminating the need for manual SQL execution.
+
 ## Project Structure
 
 ```
@@ -105,7 +133,8 @@ time-cube-dashboard/
 ├── config/
 │   └── routes.php              # All route definitions
 ├── database/
-│   ├── schema.sql              # Database schema (7 tables)
+│   ├── migrations/             # Doctrine migration files
+│   ├── schema.sql              # Legacy schema (replaced by migrations)
 │   └── app.db                  # SQLite database (auto-created)
 ├── public/
 │   ├── index.php               # Application entry point
@@ -116,7 +145,7 @@ time-cube-dashboard/
 │   ├── Core/                   # Framework core components
 │   │   ├── App.php             # Application bootstrap
 │   │   ├── Router.php          # Request routing
-│   │   ├── Database.php        # SQLite singleton
+│   │   ├── Database.php        # DBAL wrapper with migrations
 │   │   ├── Auth.php            # Authentication helpers
 │   │   └── Controller.php      # Base controller
 │   ├── Controllers/            # Application controllers

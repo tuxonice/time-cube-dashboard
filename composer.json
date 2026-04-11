@@ -6,7 +6,8 @@
         "php": ">=8.3",
         "twig/twig": "^3.0",
         "symfony/http-foundation": "^7.0",
-        "doctrine/dbal": "^4.0"
+        "doctrine/dbal": "^4.0",
+        "doctrine/migrations": "^3.8"
     },
     "autoload": {
         "psr-4": {
