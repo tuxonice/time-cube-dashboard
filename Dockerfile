@@ -10,10 +10,15 @@ RUN a2enmod rewrite
 # Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
+    git \
     unzip \
     gosu \
     && docker-php-ext-install pdo pdo_sqlite \
-    && rm -rf /var/lib/apt/lists/*
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY docker/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Create 'sail' user with same UID/GID as host user (like Laravel Sail)
 RUN groupadd --force -g ${GROUP_ID} sail \
