@@ -2,34 +2,50 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class Auth
 {
+    private static ?SessionInterface $session = null;
+
+    public static function setSession(SessionInterface $session): void
+    {
+        self::$session = $session;
+    }
+
+    private static function session(): SessionInterface
+    {
+        if (self::$session === null) {
+            throw new \RuntimeException('Session not initialized. Call Auth::setSession() first.');
+        }
+        return self::$session;
+    }
+
     public static function login(array $user): void
     {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['avatar'] = $user['avatar'] ?? null;
+        self::session()->set('user_id', $user['id']);
+        self::session()->set('username', $user['username']);
+        self::session()->set('avatar', $user['avatar'] ?? null);
     }
 
     public static function logout(): void
     {
-        session_destroy();
-        $_SESSION = [];
+        self::session()->invalidate();
     }
 
     public static function check(): bool
     {
-        return isset($_SESSION['user_id']);
+        return self::session()->has('user_id');
     }
 
     public static function userId(): ?int
     {
-        return $_SESSION['user_id'] ?? null;
+        return self::session()->get('user_id');
     }
 
     public static function username(): ?string
     {
-        return $_SESSION['username'] ?? null;
+        return self::session()->get('username');
     }
 
     public static function user(): ?array
@@ -40,7 +56,7 @@ class Auth
         return [
             'id'       => self::userId(),
             'username' => self::username(),
-            'avatar'   => $_SESSION['avatar'] ?? null,
+            'avatar'   => self::session()->get('avatar'),
         ];
     }
 }

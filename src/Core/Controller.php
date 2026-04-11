@@ -2,15 +2,19 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 abstract class Controller
 {
     protected Environment $twig;
+    protected SessionInterface $session;
 
-    public function __construct()
+    public function __construct(SessionInterface $session)
     {
+        $this->session = $session;
+
         $loader = new FilesystemLoader(dirname(__DIR__, 2) . '/templates');
         $this->twig = new Environment($loader, [
             'cache' => false,
@@ -41,13 +45,13 @@ abstract class Controller
 
     protected function flash(string $type, string $message): void
     {
-        $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+        $this->session->set('flash', ['type' => $type, 'message' => $message]);
     }
 
     private function getFlash(): ?array
     {
-        $flash = $_SESSION['flash'] ?? null;
-        unset($_SESSION['flash']);
+        $flash = $this->session->get('flash');
+        $this->session->remove('flash');
         return $flash;
     }
 

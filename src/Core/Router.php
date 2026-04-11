@@ -2,9 +2,17 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 class Router
 {
     private array $routes = [];
+    private SessionInterface $session;
+
+    public function __construct(SessionInterface $session)
+    {
+        $this->session = $session;
+    }
 
     public function add(string $method, string $path, string $controller, string $action): void
     {
@@ -52,7 +60,7 @@ class Router
                     return;
                 }
 
-                $controller = new $controllerClass();
+                $controller = new $controllerClass($this->session);
 
                 if (!method_exists($controller, $action)) {
                     http_response_code(500);

@@ -2,17 +2,24 @@
 
 namespace App\Core;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+
 class App
 {
     private Router $router;
+    private Session $session;
 
     public function __construct()
     {
-        session_start();
+        $this->session = new Session(new NativeSessionStorage());
+        $this->session->start();
+
+        Auth::setSession($this->session);
 
         Database::init();
 
-        $this->router = new Router();
+        $this->router = new Router($this->session);
         $this->loadRoutes();
     }
 

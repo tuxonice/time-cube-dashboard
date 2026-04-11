@@ -20,9 +20,10 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 
 ## Tech Stack
 
-- **Backend**: PHP 8.3 (custom MVC framework, no Laravel/Symfony)
+- **Backend**: PHP 8.3 (custom MVC framework)
 - **Database**: SQLite with PDO
 - **Templating**: Twig 3.x
+- **Session Management**: Symfony HTTP Foundation (Session component)
 - **Frontend**: Vanilla JavaScript, CSS (no build tools)
 - **Containerization**: Docker & Docker Compose
 - **Web Server**: Apache with mod_rewrite
@@ -176,7 +177,7 @@ Content-Type: application/json
 
 ### Authentication
 
-- **Web Interface**: Session-based (`$_SESSION['user_id']`)
+- **Web Interface**: Session-based using Symfony Session component
 - **API**: Bearer token authentication
 - Generate API tokens in Settings → API Tokens
 
