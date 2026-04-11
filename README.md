@@ -70,17 +70,23 @@ git clone <repository-url>
 cd time-cube-dashboard
 ```
 
-2. **Start the application**
+2. **Configure user permissions (recommended)**
+```bash
+./setup-user.sh
+```
+This creates a `.env` file with your host user ID/group ID to avoid Docker permission issues.
+
+3. **Start the application**
 ```bash
 make up
 # or
 docker compose up -d --build
 ```
 
-3. **Access the application**
+4. **Access the application**
 Open your browser to `http://localhost:8000`
 
-4. **Create an account**
+5. **Create an account**
 Register a new user account through the web interface
 
 ### Development Commands
@@ -149,6 +155,61 @@ docker compose exec app php vendor/bin/phpcs src/Controllers/
 ```
 
 **Configuration:** `phpcs.xml` - Configured for PSR-12 with custom rules for line length and migration files.
+
+### Docker User Mapping
+
+To avoid permission issues with files created inside Docker containers, the project maps the container user to your host user.
+
+**Automatic setup:**
+```bash
+./setup-user.sh
+```
+
+**Manual setup:**
+```bash
+# Get your user and group IDs
+id -u  # USER_ID
+id -g  # GROUP_ID
+
+# Create .env file
+echo "USER_ID=$(id -u)" > .env
+echo "GROUP_ID=$(id -g)" >> .env
+
+# Rebuild containers
+make up
+```
+
+**How it works (Laravel Sail-style):**
+- A `sail` user is created in the container with your host UID/GID (e.g., 1000:1000)
+- Apache is configured to run as the `sail` user instead of `www-data`
+- All application code executes as the `sail` user (non-root)
+- Files created by the application are owned by your host user
+- Use `make cli` to open a shell as the `sail` user
+- No more `sudo` needed to edit files created by Docker
+
+**Running commands:**
+```bash
+# As sail user (recommended for most tasks)
+docker compose exec -u sail app bash
+docker compose exec -u sail app php bin/migrations status
+make cli  # Shortcut for bash as sail user
+
+# As root (only when needed for system tasks)
+docker compose exec app bash
+```
+
+**Security benefits:**
+- Container starts as root only for initial permission setup
+- Apache and PHP run as non-root `sail` user
+- Application code never executes as root
+- Files created by the application are owned by your host user
+- Same security model as Laravel Sail
+
+**Configuration files:**
+- `.env` - Your user/group IDs (create from `.env.example`)
+- `docker-compose.yml` - Passes USER_ID/GROUP_ID as build args
+- `Dockerfile` - Creates sail user, configures Apache to run as sail
+- `docker-entrypoint.sh` - Handles permissions and user switching
 
 ## Project Structure
 

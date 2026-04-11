@@ -1,9 +1,13 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
     ports:
       - "8000:80"
     volumes:
       - .:/var/www/html
-    command: bash -c "chown -R www-data:www-data /var/www/html/database /var/www/html/public/uploads && apache2-foreground"
+    command: bash -c "chown -R sail:sail /var/www/html/database /var/www/html/public/uploads 2>/dev/null || true && apache2-foreground"
     restart: "no"

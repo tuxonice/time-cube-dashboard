@@ -10,7 +10,7 @@ stop:
 	docker compose stop
 
 cli:
-	docker compose exec app bash
+	docker compose exec -u sail app bash
 
 phpcs:
 	docker compose exec app php vendor/bin/phpcs
