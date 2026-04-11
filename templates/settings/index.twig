@@ -25,6 +25,7 @@
 
         <!-- Create token form -->
         <form method="post" action="/settings/tokens" class="row g-2 align-items-end mb-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="col-auto flex-grow-1">
                 <label class="form-label" for="token-name">Token name</label>
                 <input type="text" id="token-name" name="name" class="form-control" placeholder="e.g. Office Cube" required>
@@ -56,6 +57,7 @@
                         <td class="text-end">
                             <form action="/settings/tokens/{{ token.id }}/delete" method="post" class="d-inline"
                                   onsubmit="return confirm('Revoke this token? The device using it will lose access.')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i aria-hidden="true" class="bi bi-trash"></i> Revoke
                                 </button>

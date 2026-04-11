@@ -34,6 +34,7 @@
                 {% if auth.avatar %}
                     <form method="post" action="/profile/avatar/remove"
                           onsubmit="return confirm('Remove your avatar?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <button type="submit" class="btn btn-sm btn-outline-danger">
                             <i aria-hidden="true" class="bi bi-trash me-1"></i>Remove
                         </button>
@@ -44,6 +45,7 @@
 
         <form method="post" action="/profile/avatar" enctype="multipart/form-data"
               class="row g-3 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="col-md-6">
                 <label class="form-label" for="avatar">Upload new avatar</label>
                 <input type="file" id="avatar" name="avatar" class="form-control"
@@ -63,7 +65,8 @@
     </div>
     <div class="card-body">
         <form method="post" action="/profile">
-            <input type="hidden" name="section" value="profile">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="section" value="profile"
             <div class="row g-3 align-items-end">
                 <div class="col-md-6">
                     <label class="form-label" for="name">Name</label>
@@ -88,6 +91,7 @@
     </div>
     <div class="card-body">
         <form method="post" action="/profile">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <input type="hidden" name="section" value="password">
             <div class="row g-3">
                 <div class="col-md-6">

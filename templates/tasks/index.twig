@@ -69,6 +69,7 @@
                             </a>
                             <form action="/tasks/{{ task.id }}/delete" method="post" class="d-inline"
                                   onsubmit="return confirm('Delete this task and all time entries?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i aria-hidden="true" class="bi bi-trash"></i>
                                 </button>

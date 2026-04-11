@@ -26,6 +26,7 @@
     </div>
     <div class="card-body">
         <form method="post" action="/cubes" class="row g-2 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="col-md-4">
                 <label class="form-label" for="cube_id">Cube ID</label>
                 <input type="text" id="cube_id" name="cube_id" class="form-control" placeholder="e.g. cube-123abc" required>
@@ -74,6 +75,7 @@
                         </a>
                         <form action="/cubes/{{ cube.id }}/delete" method="post" class="d-inline"
                               onsubmit="return confirm('Delete this cube and all its mappings?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i aria-hidden="true" class="bi bi-trash"></i>
                             </button>

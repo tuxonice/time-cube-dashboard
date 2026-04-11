@@ -57,6 +57,11 @@ class TimeEntryController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $task = $this->getTaskForUser($taskId);
         if ($task instanceof RedirectResponse) {
             return $task;
@@ -78,6 +83,11 @@ class TimeEntryController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $entry = $this->getEntryForUser($id);
         if ($entry instanceof RedirectResponse) {
             return $entry;
@@ -105,6 +115,11 @@ class TimeEntryController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $task = $this->getTaskForUser($taskId);
         if ($task instanceof RedirectResponse) {
             return $task;
@@ -130,6 +145,11 @@ class TimeEntryController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $entry = $this->getEntryForUser($id);
         if ($entry instanceof RedirectResponse) {
             return $entry;

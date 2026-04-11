@@ -27,6 +27,10 @@ class ProfileController extends Controller
             return $redirect;
         }
 
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $user = Auth::user();
         $section = $this->post('section', '');
 
@@ -131,6 +135,10 @@ class ProfileController extends Controller
             return $redirect;
         }
 
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $user = Auth::user();
         $file = $this->request->files->get('avatar');
 
@@ -188,6 +196,10 @@ class ProfileController extends Controller
     {
         if ($redirect = $this->requireAuth()) {
             return $redirect;
+        }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
         }
 
         $user = Auth::user();

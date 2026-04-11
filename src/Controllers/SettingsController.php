@@ -23,6 +23,11 @@ class SettingsController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $name = trim($this->post('name', ''));
 
         if ($name === '') {
@@ -40,6 +45,11 @@ class SettingsController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $token = ApiToken::find((int) $id);
 
         if (!$token || $token['user_id'] !== Auth::userId()) {

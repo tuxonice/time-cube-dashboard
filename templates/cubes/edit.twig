@@ -26,6 +26,7 @@
     </div>
     <div class="card-body">
         <form method="post" action="/cubes/{{ cube.id }}/mappings" class="row g-2 align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="col-md-3">
                 <label class="form-label" for="face_color">Face Color</label>
                 <input type="text" id="face_color" name="face_color" class="form-control" placeholder="e.g. yellow, red, blue" required>
@@ -75,6 +76,7 @@
                     <td class="text-end">
                         <form action="/cubes/{{ cube.id }}/mappings/{{ mapping.id }}/delete" method="post" class="d-inline"
                               onsubmit="return confirm('Remove this mapping?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i aria-hidden="true" class="bi bi-trash"></i>
                             </button>

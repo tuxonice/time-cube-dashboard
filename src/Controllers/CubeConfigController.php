@@ -24,6 +24,11 @@ class CubeConfigController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $cubeId = trim($this->post('cube_id', ''));
         $name = trim($this->post('name', ''));
 
@@ -47,6 +52,11 @@ class CubeConfigController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $cube = CubeConfig::findCube((int) $id);
 
         if (!$cube || $cube['user_id'] !== Auth::userId()) {
@@ -95,6 +105,11 @@ class CubeConfigController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $cube = CubeConfig::findCube((int) $id);
 
         if (!$cube || $cube['user_id'] !== Auth::userId()) {
@@ -120,6 +135,11 @@ class CubeConfigController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $cube = CubeConfig::findCube((int) $id);
 
         if (!$cube || $cube['user_id'] !== Auth::userId()) {

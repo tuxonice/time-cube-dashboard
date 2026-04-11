@@ -29,6 +29,7 @@ abstract class Controller
 
         $this->twig->addGlobal('auth', Auth::user());
         $this->twig->addGlobal('flash', $this->getFlash());
+        $this->twig->addGlobal('csrf_token', Auth::csrfToken());
     }
 
     protected function render(string $template, array $data = []): Response
@@ -65,6 +66,21 @@ abstract class Controller
     protected function post(string $key, mixed $default = null): mixed
     {
         return $this->request->request->get($key, $default);
+    }
+
+    protected function validateCsrf(): bool
+    {
+        $token = $this->post('csrf_token');
+        return Auth::validateCsrfToken($token);
+    }
+
+    protected function requireCsrf(): ?Response
+    {
+        if (!$this->validateCsrf()) {
+            $this->flash('error', 'Invalid security token. Please try again.');
+            return $this->redirect($this->request->headers->get('referer') ?? '/');
+        }
+        return null;
     }
 
     protected function json(array $data, int $status = 200): JsonResponse

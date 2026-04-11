@@ -31,6 +31,11 @@ class ProjectController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $name = trim($this->post('name', ''));
         $description = trim($this->post('description', ''));
 
@@ -64,6 +69,11 @@ class ProjectController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $project = Project::find((int) $id);
 
         if (!$project || $project['user_id'] !== Auth::userId()) {
@@ -89,6 +99,11 @@ class ProjectController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $project = Project::find((int) $id);
 
         if (!$project || $project['user_id'] !== Auth::userId()) {

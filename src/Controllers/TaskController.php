@@ -61,6 +61,11 @@ class TaskController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $project = $this->getProject($projectId);
         if ($project instanceof RedirectResponse) {
             return $project;
@@ -96,6 +101,11 @@ class TaskController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $task = $this->getTask($id);
         if ($task instanceof RedirectResponse) {
             return $task;
@@ -119,6 +129,11 @@ class TaskController extends Controller
         if ($redirect = $this->requireAuth()) {
             return $redirect;
         }
+
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $task = $this->getTask($id);
         if ($task instanceof RedirectResponse) {
             return $task;

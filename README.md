@@ -35,6 +35,58 @@ The system integrates with an ESP32-based physical cube device. Each face of the
 
 ## Architecture
 
+### CSRF Protection
+
+The application implements CSRF (Cross-Site Request Forgery) protection for all form submissions using session-based tokens.
+
+**How it works:**
+- A unique CSRF token is generated per session and stored in `$_SESSION['csrf_token']`
+- The token is automatically available in all Twig templates as `{{ csrf_token }}`
+- All forms include a hidden field: `<input type="hidden" name="csrf_token" value="{{ csrf_token }}">`
+- Controllers validate the token using `$this->requireCsrf()` before processing form data
+- Invalid tokens result in an error message and redirect back to the form
+
+**Implementation:**
+```php
+// In Auth class
+public static function csrfToken(): string
+{
+    return self::generateCsrfToken();
+}
+
+public static function validateCsrfToken(?string $token): bool
+{
+    return hash_equals(self::session()->get('csrf_token'), $token);
+}
+
+// In Controller
+protected function requireCsrf(): ?Response
+{
+    if (!$this->validateCsrf()) {
+        $this->flash('error', 'Invalid security token. Please try again.');
+        return $this->redirect($this->request->headers->get('referer') ?? '/');
+    }
+    return null;
+}
+
+// In controller methods
+public function store(): Response
+{
+    if ($response = $this->requireCsrf()) {
+        return $response;
+    }
+    // Process form...
+}
+```
+
+**In templates:**
+```twig
+<form method="post" action="/projects">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <!-- form fields -->
+</form>
+```
+
 ### Middleware System
 
 The application uses a flexible middleware pipeline for request handling. Middleware can short-circuit requests (e.g., redirect unauthenticated users) or pass data to controllers.

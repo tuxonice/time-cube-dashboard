@@ -18,6 +18,7 @@
             <div class="timer-display timer-running mt-1" id="timer" data-started="{{ running.started_at }}">00:00:00</div>
         </div>
         <form action="/time/{{ running.id }}/stop" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <button type="submit" class="btn btn-danger">
                 <i aria-hidden="true" class="bi bi-stop-circle me-1"></i> Stop
             </button>

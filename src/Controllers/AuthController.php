@@ -19,6 +19,10 @@ class AuthController extends Controller
 
     public function login(): Response
     {
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $email = $this->post('email');
         $password = $this->post('password');
 
@@ -53,6 +57,10 @@ class AuthController extends Controller
 
     public function register(): Response
     {
+        if ($response = $this->requireCsrf()) {
+            return $response;
+        }
+
         $email = trim($this->post('email', ''));
         $name = trim($this->post('name', ''));
         $password = $this->post('password', '');

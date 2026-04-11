@@ -66,4 +66,41 @@ class Auth
             'avatar' => self::session()->get('avatar'),
         ];
     }
+
+    /**
+     * Generate a CSRF token and store it in the session
+     */
+    public static function generateCsrfToken(): string
+    {
+        if (!self::session()->has('csrf_token')) {
+            $token = bin2hex(random_bytes(32));
+            self::session()->set('csrf_token', $token);
+        }
+        return self::session()->get('csrf_token');
+    }
+
+    /**
+     * Validate a CSRF token against the session token
+     */
+    public static function validateCsrfToken(?string $token): bool
+    {
+        if (!$token) {
+            return false;
+        }
+
+        $sessionToken = self::session()->get('csrf_token');
+        if (!$sessionToken) {
+            return false;
+        }
+
+        return hash_equals($sessionToken, $token);
+    }
+
+    /**
+     * Get the current CSRF token (generates if not exists)
+     */
+    public static function csrfToken(): string
+    {
+        return self::generateCsrfToken();
+    }
 }

@@ -32,12 +32,14 @@
         </div>
         {% if running %}
             <form action="/time/{{ running.id }}/stop" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <button type="submit" class="btn btn-danger btn-lg">
                     <i aria-hidden="true" class="bi bi-stop-circle me-1"></i> Stop
                 </button>
             </form>
         {% else %}
             <form action="/tasks/{{ task.id }}/time/start" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <button type="submit" class="btn btn-success btn-lg">
                     <i aria-hidden="true" class="bi bi-play-circle me-1"></i> Start
                 </button>
@@ -105,6 +107,7 @@
                     <td class="text-end">
                         {% if entry.started_at and not entry.stopped_at %}
                             <form action="/time/{{ entry.id }}/stop" method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                                 <button type="submit" class="btn btn-sm btn-outline-warning">
                                     <i aria-hidden="true" class="bi bi-stop-circle"></i>
                                 </button>
@@ -112,6 +115,7 @@
                         {% endif %}
                         <form action="/time/{{ entry.id }}/delete" method="post" class="d-inline"
                               onsubmit="return confirm('Delete this time entry?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                 <i aria-hidden="true" class="bi bi-trash"></i>
                             </button>
