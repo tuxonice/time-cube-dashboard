@@ -28,7 +28,7 @@ class Database
     public static function getInstance(): self
     {
         if (self::$instance === null) {
-            $dbPath = dirname(__DIR__, 2) . '/database/app.db';
+            $dbPath = dirname(__DIR__, 2) . '/storage/database/app.db';
             self::$instance = new self($dbPath);
         }
         return self::$instance;
