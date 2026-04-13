@@ -8,6 +8,7 @@ use Doctrine\DBAL\Result;
 use Doctrine\Migrations\Configuration\Migration\PhpFile;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
 
 class Database
@@ -55,9 +56,12 @@ class Database
             if (count($newMigrations) > 0) {
                 // Execute all new migrations
                 $planCalculator = $dependencyFactory->getMigrationPlanCalculator();
-                $versions = $newMigrations->getItems();
+                $versions = array_map(
+                    fn($migration) => $migration->getVersion(),
+                    $newMigrations->getItems()
+                );
                 $plan = $planCalculator->getPlanForVersions($versions, Direction::UP);
-                $migrator->migrate($plan);
+                $migrator->migrate($plan, new MigratorConfiguration());
             }
         } catch (\Exception $e) {
             // Silently continue if migrations fail (e.g., already executed)
