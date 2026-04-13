@@ -19,6 +19,10 @@ class App
         // Load environment variables from .env file
         $this->loadEnvironment();
 
+        // Initialise logger (reads LOG_LEVEL / APP_ENV from env, so must come after loadEnvironment)
+        Logger::getInstance();
+        Logger::registerHandlers();
+
         $this->request = Request::createFromGlobals();
 
         $this->session = new Session(new NativeSessionStorage());

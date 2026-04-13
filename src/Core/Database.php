@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
+use App\Core\Logger;
 
 class Database
 {
@@ -47,6 +48,8 @@ class Database
                 new ExistingConnection($db->connection)
             );
 
+            $dependencyFactory->getMetadataStorage()->ensureInitialized();
+
             $statusCalculator = $dependencyFactory->getMigrationStatusCalculator();
             $migrator = $dependencyFactory->getMigrator();
 
@@ -64,8 +67,10 @@ class Database
                 $migrator->migrate($plan, new MigratorConfiguration());
             }
         } catch (\Exception $e) {
-            // Silently continue if migrations fail (e.g., already executed)
-            // In production, you might want to log this
+            Logger::error('Migration failed', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
         }
     }
 
