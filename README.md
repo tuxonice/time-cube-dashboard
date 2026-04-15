@@ -660,12 +660,12 @@ docker compose logs -f app
 
 ## License
 
-This project is proprietary software.
+This project is open source and available under the [MIT License](LICENSE).
 
 ## Contributing
 
-This is a personal project. Contributions are not currently accepted.
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## Support
 
-For issues or questions, please contact the project maintainer.
+For issues or questions, please open an issue on GitHub.
