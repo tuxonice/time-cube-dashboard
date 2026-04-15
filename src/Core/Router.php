@@ -81,14 +81,14 @@ class Router
 
                 // Execute middleware stack (global + route-specific)
                 $middlewareStack = new MiddlewareStack();
-                
+
                 // Add global middleware first
                 foreach ($this->globalMiddleware as $middlewareClass) {
                     if (class_exists($middlewareClass)) {
                         $middlewareStack->add(new $middlewareClass());
                     }
                 }
-                
+
                 // Then add route-specific middleware
                 foreach ($route['middleware'] as $middlewareClass) {
                     if (class_exists($middlewareClass)) {

@@ -39,12 +39,12 @@ class MiddlewareStack
 
         return function (Request $request) use ($current, $next): Response {
             $result = $current->handle($request, $next);
-            
+
             // If middleware returns a Response, use it (short-circuit)
             if ($result instanceof Response) {
                 return $result;
             }
-            
+
             // Otherwise continue to next middleware
             return $next($request);
         };

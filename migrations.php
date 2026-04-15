@@ -9,7 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 
 $config = new PhpFile(__DIR__ . '/migrations-config.php');
 
-$dbPath = __DIR__ . '/database/app.db';
+$dbPath = __DIR__ . '/storage/database/app.db';
 $connectionParams = [
     'driver' => 'pdo_sqlite',
     'path' => $dbPath,

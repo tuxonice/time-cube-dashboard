@@ -102,7 +102,7 @@ class ProfileController extends Controller
             if (!empty($updateData)) {
                 User::update($user['id'], $updateData);
                 $this->flash('success', 'Profile updated successfully');
-                
+
                 // Refresh user data in session
                 $updatedUser = User::find($user['id']);
                 Auth::login($updatedUser);

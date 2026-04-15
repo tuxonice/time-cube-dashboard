@@ -20,7 +20,7 @@ final class Version20260411203350 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // SQLite doesn't support ALTER COLUMN, so we need to recreate the table
-        
+
         // Create new users table with email and name
         $this->connection->executeStatement('CREATE TABLE users_new (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,6 +45,5 @@ final class Version20260411203350 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-
     }
 }

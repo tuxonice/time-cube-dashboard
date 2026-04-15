@@ -12,7 +12,7 @@ class GeoIpMiddleware implements MiddlewareInterface
 {
     private const API_URL = 'http://ip-api.com/json/';
     private const CACHE_DURATION = 3600; // 1 hour
-    
+
     private FilesystemAdapter $cache;
 
     public function __construct()
@@ -37,7 +37,7 @@ class GeoIpMiddleware implements MiddlewareInterface
 
         // Get client IP address
         $ip = $this->getClientIp($request);
-        
+
         // Skip check for localhost/private IPs
         if ($this->isPrivateIp($ip)) {
             return null;
@@ -45,7 +45,7 @@ class GeoIpMiddleware implements MiddlewareInterface
 
         // Get country code from IP
         $countryCode = $this->getCountryCode($ip);
-        
+
         // If we couldn't determine country, allow by default (fail open)
         if ($countryCode === null) {
             return null;
@@ -60,7 +60,7 @@ class GeoIpMiddleware implements MiddlewareInterface
                     'message' => 'Your country is not allowed to access this service'
                 ], 403);
             }
-            
+
             return new Response(
                 '<h1>Access Denied</h1><p>Your country is not allowed to access this service.</p>',
                 403
@@ -74,7 +74,7 @@ class GeoIpMiddleware implements MiddlewareInterface
     private function getAllowedCountries(): array
     {
         $countries = $_ENV['ALLOWED_COUNTRIES'] ?? '';
-        
+
         if (empty($countries)) {
             return [];
         }
@@ -136,7 +136,7 @@ class GeoIpMiddleware implements MiddlewareInterface
         $ipLong = ip2long($ip);
         $subnetLong = ip2long($subnet);
         $maskLong = -1 << (32 - (int)$mask);
-        
+
         return ($ipLong & $maskLong) === ($subnetLong & $maskLong);
     }
 
@@ -149,7 +149,7 @@ class GeoIpMiddleware implements MiddlewareInterface
                 function (ItemInterface $item) use ($ip): ?string {
                     // Set cache expiration
                     $item->expiresAfter(self::CACHE_DURATION);
-                    
+
                     // Query IP-API
                     $url = self::API_URL . $ip . '?fields=status,countryCode';
                     $response = @file_get_contents($url, false, stream_context_create([
@@ -164,7 +164,7 @@ class GeoIpMiddleware implements MiddlewareInterface
                     }
 
                     $data = json_decode($response, true);
-                    
+
                     if (!$data || !isset($data['status']) || $data['status'] !== 'success') {
                         return null;
                     }

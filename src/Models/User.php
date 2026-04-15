@@ -35,7 +35,7 @@ class User
         // Only allow updating specific fields
         $allowedFields = ['name', 'email', 'password', 'avatar'];
         $updateData = array_intersect_key($data, array_flip($allowedFields));
-        
+
         if (!empty($updateData)) {
             Database::getInstance()->update('users', $updateData, ['id' => $id]);
         }
