@@ -9,6 +9,7 @@ make up       # Build and start Docker containers (first run or after Dockerfile
 make start    # Start existing containers
 make stop     # Stop containers
 make cli      # Open bash shell inside the app container
+make migrate  # Run pending database migrations
 make phpcs    # Run PHP_CodeSniffer (PSR-12)
 make phpcbf   # Auto-fix code style issues
 ```
@@ -36,7 +37,7 @@ composer phpstan          # Run PHPStan static analysis (level 5)
 
 **Routing:** Defined in `config/routes.php`. The router (`src/Core/Router.php`) converts `{param}` placeholders to regex and passes extracted values to controllers.
 
-**Database:** SQLite singleton (`src/Core/Database.php`) using Doctrine DBAL. Pending migrations are run automatically on first connection. The DB file is at `storage/database/app.db` (gitignored, persisted via Docker volume `db-data`). Migrations live in `database/migrations/` and are configured via `migrations-config.php`.
+**Database:** SQLite singleton (`src/Core/Database.php`) using Doctrine DBAL. The DB file is at `storage/database/app.db` (gitignored, persisted via Docker volume `db-data`). Migrations live in `database/migrations/` and are configured via `migrations-config.php`. Run migrations explicitly with `make migrate`.
 
 **Auth:** Session-based (`$_SESSION['user_id']`). Controllers call `$this->requireAuth()` from the base `Controller` class. The API endpoint uses X-Time-Cube-Token token auth via `api_tokens` table.
 

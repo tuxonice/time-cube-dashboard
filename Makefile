@@ -1,4 +1,4 @@
-.PHONY: up start stop cli phpcs phpcbf test-code
+.PHONY: up start stop cli phpcs phpcbf test-code migrate
 
 up:
 	docker compose up -d --build
@@ -17,6 +17,9 @@ phpcs:
 
 phpcbf:
 	docker compose exec app php vendor/bin/phpcbf
+
+migrate:
+	docker compose exec app php bin/migrations migrate --no-interaction
 
 test-code: phpcs
 	@echo "Code style check completed"

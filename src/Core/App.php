@@ -31,7 +31,7 @@ class App
 
         Auth::setSession($this->session);
 
-        Database::init();
+        Database::getInstance();
 
         $this->router = new Router($this->session, $this->request);
         $this->loadRoutes();

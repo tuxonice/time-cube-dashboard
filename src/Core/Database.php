@@ -5,12 +5,6 @@ namespace App\Core;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Result;
-use Doctrine\Migrations\Configuration\Migration\PhpFile;
-use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
-use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\Version\Direction;
-use App\Core\Logger;
 
 class Database
 {
@@ -34,44 +28,6 @@ class Database
             self::$instance = new self($dbPath);
         }
         return self::$instance;
-    }
-
-    public static function init(): void
-    {
-        $db = self::getInstance();
-
-        // Run migrations automatically if needed
-        try {
-            $config = new PhpFile(dirname(__DIR__, 2) . '/migrations-config.php');
-            $dependencyFactory = DependencyFactory::fromConnection(
-                $config,
-                new ExistingConnection($db->connection)
-            );
-
-            $dependencyFactory->getMetadataStorage()->ensureInitialized();
-
-            $statusCalculator = $dependencyFactory->getMigrationStatusCalculator();
-            $migrator = $dependencyFactory->getMigrator();
-
-            // Check if there are new migrations to execute
-            $newMigrations = $statusCalculator->getNewMigrations();
-
-            if (count($newMigrations) > 0) {
-                // Execute all new migrations
-                $planCalculator = $dependencyFactory->getMigrationPlanCalculator();
-                $versions = array_map(
-                    fn($migration) => $migration->getVersion(),
-                    $newMigrations->getItems()
-                );
-                $plan = $planCalculator->getPlanForVersions($versions, Direction::UP);
-                $migrator->migrate($plan, new MigratorConfiguration());
-            }
-        } catch (\Exception $e) {
-            Logger::error('Migration failed', [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
-            ]);
-        }
     }
 
     public function query(string $sql, array $params = []): Result
