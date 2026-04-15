@@ -6,9 +6,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Doctrine\Migrations\Tools\Console\Command;
 use Symfony\Component\Console\Application;
 
-$dependencyFactory = require __DIR__ . '/../migrations.php';
+$dependencyFactory = require __DIR__ . '/../database/migrations.php';
 
-$cli = new Application('Doctrine Migrations');
+$cli = new Application('Console Commands');
 $cli->setCatchExceptions(true);
 
 $cli->addCommands([

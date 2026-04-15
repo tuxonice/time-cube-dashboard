@@ -277,7 +277,7 @@ ALLOWED_COUNTRIES=US,GB,DE,FR,ES
 ### Development Commands
 
 ```bash
-make up        # Build and start Docker containers (first run or after Dockerfile changes)
+make up        # Build and start Docker containers (first run or after docker/Dockerfile changes)
 make start     # Start existing containers
 make stop      # Stop containers
 make cli       # Open bash shell inside the app container
@@ -298,12 +298,12 @@ The project uses Doctrine Migrations for database schema management. Migrations 
 
 **Check migration status:**
 ```bash
-docker compose exec app php bin/migrations status
+docker compose exec app php bin/console status
 ```
 
 **Run pending migrations:**
 ```bash
-docker compose exec app php bin/migrations migrate
+docker compose exec app php bin/console migrate
 ```
 
 ### Static Analysis with PHPStan
@@ -378,12 +378,12 @@ test('password hashing works', function () {
 
 **Generate a new migration:**
 ```bash
-docker compose exec app php bin/migrations generate
+docker compose exec app php bin/console generate
 ```
 
 **List all migrations:**
 ```bash
-docker compose exec app php bin/migrations list
+docker compose exec app php bin/console list
 ```
 
 **Migration files location:** `database/migrations/`
@@ -446,7 +446,7 @@ make up
 ```bash
 # As sail user (recommended for most tasks)
 docker compose exec -u sail app bash
-docker compose exec -u sail app php bin/migrations status
+docker compose exec -u sail app php bin/console status
 make cli  # Shortcut for bash as sail user
 
 # As root (only when needed for system tasks)
@@ -463,8 +463,8 @@ docker compose exec app bash
 **Configuration files:**
 - `.env` - Your user/group IDs (create from `.env.example`)
 - `docker-compose.yml` - Passes USER_ID/GROUP_ID as build args
-- `Dockerfile` - Creates sail user, configures Apache to run as sail
-- `docker-entrypoint.sh` - Handles permissions and user switching
+- `docker/Dockerfile` - Creates sail user, configures Apache to run as sail
+- `docker/docker-entrypoint.sh` - Handles permissions and user switching
 
 ## Project Structure
 
@@ -515,12 +515,16 @@ time-cube-dashboard/
 │   └── [feature]/              # Feature-specific templates
 ├── .gitignore
 ├── composer.json               # PHP dependencies
+├── docker/
+│   ├── Dockerfile              # Container configuration
+│   ├── docker-entrypoint.sh    # Container entrypoint
+│   └── xdebug.ini              # Xdebug configuration
 ├── docker-compose.yml          # Service orchestration
-├── Dockerfile                  # Container configuration
 ├── Makefile                    # Development shortcuts
 ├── phpcs.xml                   # PHP_CodeSniffer configuration
-├── migrations.php              # Doctrine migrations bootstrap
-└── migrations-config.php       # Doctrine migrations config
+├── database/
+│   ├── migrations.php          # Doctrine migrations bootstrap
+│   └── migrations-config.php   # Doctrine migrations config
 ```
 
 ## API Documentation
@@ -621,7 +625,7 @@ Parameters in `{brackets}` are extracted and passed to controller methods.
 
 ### Docker Production
 
-The included Dockerfile is production-ready:
+The included `docker/Dockerfile` is production-ready:
 - PHP 8.3 with Apache
 - Composer dependencies optimized
 - Proper file permissions for database and uploads

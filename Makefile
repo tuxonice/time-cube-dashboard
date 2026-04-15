@@ -32,7 +32,7 @@ phpcbf:
 	docker compose exec app php vendor/bin/phpcbf
 
 migrate:
-	docker compose exec app php bin/migrations migrate --no-interaction
+	docker compose exec app php bin/console migrate --no-interaction
 
 test-code: phpcs
 	@echo "Code style check completed"
