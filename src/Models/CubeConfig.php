@@ -68,9 +68,9 @@ class CubeConfig
         );
     }
 
-    public static function deleteMapping(int $id): void
+    public static function deleteMapping(int $id, int $cubeDbId): void
     {
-        Database::getInstance()->delete('cube_face_mappings', ['id' => $id]);
+        Database::getInstance()->delete('cube_face_mappings', ['id' => $id, 'cube_id' => $cubeDbId]);
     }
 
     public static function findTaskByFace(string $cubeIdentifier, string $faceColor): ?array

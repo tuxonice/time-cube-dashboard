@@ -147,7 +147,7 @@ class CubeConfigController extends Controller
             return $this->redirect('/cubes');
         }
 
-        CubeConfig::deleteMapping((int) $mappingId);
+        CubeConfig::deleteMapping((int) $mappingId, $cube['id']);
         $this->flash('success', 'Mapping removed.');
         return $this->redirect("/cubes/{$id}");
     }
