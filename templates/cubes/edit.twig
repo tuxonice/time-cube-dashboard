@@ -29,7 +29,18 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="col-md-3">
                 <label class="form-label" for="face_color">Face Color</label>
-                <input type="text" id="face_color" name="face_color" class="form-control" placeholder="e.g. yellow, red, blue" required>
+                <select id="face_color" name="face_color" class="form-select" required>
+                    <option value="">— Select a color —</option>
+                    {% set mapped_colors = [] %}
+                    {% for m in mappings %}
+                        {% set mapped_colors = mapped_colors|merge([m.face_color]) %}
+                    {% endfor %}
+                    {% for color in ['white','red', 'blue', 'green', 'yellow', 'orange'] %}
+                        {% if color not in mapped_colors %}
+                            <option value="{{ color }}">{{ color|capitalize }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-5">
                 <label class="form-label" for="task_id">Task</label>
